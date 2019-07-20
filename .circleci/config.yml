@@ -1,9 +1,8 @@
 version: 2
 jobs:
   build:
-    machine:
-      image: circleci/classic:201808-01
-      docker_layer_caching: true
+    docker:
+      - image: circleci/classic:201808-01
     steps:
       - checkout
 
