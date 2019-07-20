@@ -20,4 +20,4 @@ ENV APP_COMMIT_REF=${COMMIT_REF} \
 
 EXPOSE 8000
 
-ENTRYPOINT ["/srv/cubee-api-server/docker-entrypoint.sh"]
+ENTRYPOINT ["sh", "/srv/cubee-api-server/docker-entrypoint.sh"]
