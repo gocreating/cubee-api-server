@@ -3,6 +3,14 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
+@app.route('/test', subdomain='<username>')
+def username_test(username):
+    return 'Hi, {0}'.format(username)
+
+@app.route('/', subdomain='<username>')
+def username_index(username):
+    return 'Fuck, {0}'.format(username)
+
 @app.route('/')
 def index():
     return 'Welcome to Cubee API Server'
@@ -25,4 +33,5 @@ def version():
         return 'unknown'
 
 if __name__ == '__main__':
+    app.config['SERVER_NAME'] = 'cubee.cc:8000'
     app.run(host='0.0.0.0')
