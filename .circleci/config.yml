@@ -26,6 +26,7 @@ jobs:
       - GOOGLE_PROJECT_ID: "cubee-247317"
       - GOOGLE_COMPUTE_ZONE: "asia-southeast1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-production"
+      - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
       - checkout
       - run:
@@ -51,6 +52,10 @@ jobs:
       - run:
           name: Deploy to Kubernetes
           command: |
+            kubectl create secret docker-registry some-registry \
+              --docker-server=$DOCKER_REGISTRY_SERVER \
+              --docker-username=$DOCKER_USER \
+              --docker-password=$DOCKER_PASS
             envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
             kubectl apply -f ${HOME}/patched_k8s.yml
             kubectl rollout status deployment/${PROJECT_NAME}
