@@ -53,12 +53,13 @@ jobs:
       - run:
           name: Deploy to Kubernetes
           command: |
-            kubectl create secret docker-registry some-registry \
+            kubectl create secret docker-registry tmp-registry \
               --docker-server=$DOCKER_REGISTRY_SERVER \
               --docker-username=$DOCKER_USER \
               --docker-password=$DOCKER_PASS
             envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
             kubectl apply -f ${HOME}/patched_k8s.yml
+            kubectl delete secret tmp-registry
             kubectl rollout status deployment/${PROJECT_NAME}
 
 workflows:
