@@ -1,5 +1,8 @@
 FROM python:3.7.4-slim
 
+ARG COMMIT_REF
+ARG BUILD_DATE
+
 COPY requirements.txt /tmp/requirements.txt
 
 RUN apt-get update \
@@ -11,6 +14,9 @@ RUN apt-get update \
 COPY . /srv/cubee-api-server
 
 WORKDIR /srv/cubee-api-server
+
+ENV APP_COMMIT_REF=${COMMIT_REF} \
+    APP_BUILD_DATE=${BUILD_DATE}
 
 EXPOSE 8000
 
