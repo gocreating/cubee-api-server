@@ -76,7 +76,7 @@ jobs:
             helm repo update
             cd ./helm-chart/${PROJECT_NAME}
             # helm install . --name=${PROJECT_NAME} -f values.yaml
-            helm upgrade ${PROJECT_NAME} -f values.yaml --install --force
+            helm upgrade ${PROJECT_NAME} . -f values.yaml --install --force
             helm ls
       # - run:
       #     name: Install and configuire helm
