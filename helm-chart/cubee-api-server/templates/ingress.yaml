@@ -6,6 +6,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: "ingress-prod"
 spec:
   rules:
+  # can redirect cubee.cc, mutate with next rule
   - host: cubee.cc
     http:
       paths:
@@ -13,14 +14,16 @@ spec:
         backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
-  # can redirect <any-sub-domain>.cubee.cc
-  - host: www.cubee.cc
-    http:
-      paths:
-      - path: /*
-        backend:
-          serviceName: {{ .Values.project.name }}
-          servicePort: 8000
+
+  # can redirect <any-sub-domain>.cubee.cc, mutate with previous rule
+  # - host: www.cubee.cc
+  #   http:
+  #     paths:
+  #     - path: /*
+  #       backend:
+  #         serviceName: {{ .Values.project.name }}
+  #         servicePort: 8000
+
   - host: api.cubee.cc
     http:
       paths:
