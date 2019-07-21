@@ -66,6 +66,8 @@ jobs:
           command: |
             # kubectl create clusterrolebinding cluster-admin-binding \
             #   --clusterrole cluster-admin --user gocreating@gmail.com
+            kubectl create clusterrolebinding cluster-admin-binding \
+              --clusterrole=cluster-admin --user=gocreating@gmail.com
             kubectl apply -f rbac-config.yaml
             helm init --service-account tiller --history-max 200
 

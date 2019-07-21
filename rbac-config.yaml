@@ -11,10 +11,8 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-admin
+  name: cluster-admin-binding
 subjects:
-  - kind: User
-    name: gocreating@gmail.com
   - kind: ServiceAccount
     name: tiller
     namespace: kube-system
