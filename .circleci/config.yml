@@ -65,8 +65,8 @@ jobs:
           name: initialize helm
           command: |
             kubectl apply -f rbac-config.yaml
-            kubectl delete deployment tiller-deploy --namespace=kube-system
-            kubectl delete svc tiller-deploy --namespace=kube-system
+            # kubectl delete deployment tiller-deploy --namespace=kube-system
+            # kubectl delete svc tiller-deploy --namespace=kube-system
             helm init --service-account tiller --history-max 200
 
       - run:
