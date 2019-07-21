@@ -66,8 +66,9 @@ jobs:
           command: |
             # kubectl create clusterrolebinding cluster-admin-binding \
             #   --clusterrole cluster-admin --user gocreating@gmail.com
-            kubectl apply -f rbac-config.yaml --user=gocreating@gmail.com
-            helm init --service-account tiller --history-max 200
+            # kubectl apply -f rbac-config.yaml --user=gocreating@gmail.com
+            # helm init --service-account tiller --history-max 200
+            helm init --history-max 200
 
       - run:
           name: install chart
