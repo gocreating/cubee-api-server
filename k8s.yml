@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ${PROJECT_NAME}
+  name: ingress-${PROJECT_NAME}
 spec:
   rules:
   - host: api.cubee.cc
