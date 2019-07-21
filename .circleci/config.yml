@@ -53,37 +53,27 @@ jobs:
             envsubst < ${HOME}/project/helm-chart/${PROJECT_NAME}/values-prod.yml > ${HOME}/project/helm-chart/${PROJECT_NAME}/values.yml
             # export KUBECONFIG=$HOME/.kube/kubeconfig
             kubectl delete secret tmp-registry
-      # - run:
-      #     name: install helm
-      #     command: |
-      #       echo "install helm"
+      - run:
+          name: install helm
+          command: |
+            echo "install helm"
 
-      #       # installs helm with bash commands for easier command line integration
-      #       curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+            # installs helm with bash commands for easier command line integration
+            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
 
-      #       # add a service account within a namespace to segregate tiller
-      #       kubectl create serviceaccount --namespace kube-system tiller
+      - run:
+          name: initialize helm
+          command: |
+            kubectl apply -f rbac-config.yaml
+            helm init --service-account tiller --history-max 200
 
-      #       # create a cluster role binding for tiller
-      #       kubectl create clusterrolebinding tiller-cluster-rule \
-      #         --clusterrole=cluster-admin \
-      #         --serviceaccount=kube-system:tiller
-      #       kubectl patch deploy \
-      #         --namespace kube-system tiller-deploy \
-      #         -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-
-      #       echo "initialize helm"
-      #       # initialized helm within the tiller service account
-      #       helm init --service-account tiller --upgrade
-      #       # updates the repos for Helm repo integration
-      #       helm repo update
-
-      #       echo "verify helm"
-      #       # verify that helm is installed in the cluster
-      #       kubectl get deploy,svc tiller-deploy -n kube-system
       - run:
           name: install chart
-          command: helm install --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+          command: |
+            # Make sure we get the latest list of charts
+            helm repo update
+            helm install --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+            helm ls
       # - run:
       #     name: Install and configuire helm
       #     command: curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz | tar xz && mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
