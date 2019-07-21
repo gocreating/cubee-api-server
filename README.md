@@ -6,6 +6,8 @@
 
 要將`833974311137-compute@developer.gserviceaccount.com`, `Compute Engine default service account` 新增腳色: `Kubernetes Engine 管理`
 
+要將ingress的ip從`臨時`改為`靜態`，給定名字後修改`ingress.yaml`裡的`kubernetes.io/ingress.global-static-ip-name`
+
 ## Development
 
 ```

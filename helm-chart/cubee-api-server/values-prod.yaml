@@ -9,3 +9,6 @@ pod:
   labels:
     env: "prod"
     cluster: "cubee-production"
+
+healthz:
+  path: /
