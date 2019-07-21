@@ -11,6 +11,10 @@ app.config['SERVER_NAME'] = 'cubee.cc'
 def app_index():
     return 'app index'
 
+@app.route('/hello')
+def app_hello():
+    return 'app hello'
+
 #########
 ## API ##
 #########
