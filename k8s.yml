@@ -1,16 +1,10 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress-${PROJECT_NAME}
+  name: ${PROJECT_NAME}
 spec:
   rules:
   - host: api.cubee.cc
-    http:
-      paths:
-      - backend:
-          serviceName: ${PROJECT_NAME}
-          servicePort: 8000
-  - host: api-stg.cubee.cc
     http:
       paths:
       - backend:
