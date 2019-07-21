@@ -6,7 +6,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: "ingress-prod"
 spec:
   rules:
-  - host: cubee.cc
+  - host: www.cubee.cc
     http:
       paths:
       - backend:
