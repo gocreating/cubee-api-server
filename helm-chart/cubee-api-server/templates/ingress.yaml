@@ -9,12 +9,14 @@ spec:
   - host: www.cubee.cc
     http:
       paths:
-      - backend:
+      - path: /*
+        backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
   - host: api.cubee.cc
     http:
       paths:
-      - backend:
+      - path: /*
+        backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
