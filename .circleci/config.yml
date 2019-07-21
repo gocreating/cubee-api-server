@@ -75,8 +75,8 @@ jobs:
             # Make sure we get the latest list of charts
             helm repo update
             cd ./helm-chart/${PROJECT_NAME}
-            helm install . --name=${PROJECT_NAME} -f values.yaml
-            # helm install --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+            # helm install . --name=${PROJECT_NAME} -f values.yaml
+            helm upgrade ${PROJECT_NAME} -f values.yaml --install --force
             helm ls
       # - run:
       #     name: Install and configuire helm
