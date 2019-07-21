@@ -1,0 +1,11 @@
+project:
+  name: cubee-api-server
+
+image:
+  repository: gocreating/cubee-api-server
+  tag: release-${CIRCLE_SHA1}
+
+pod:
+  labels:
+    env: "prod"
+    cluster: "cubee-production"

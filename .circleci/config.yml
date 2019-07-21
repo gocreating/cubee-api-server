@@ -1,23 +1,5 @@
 version: 2
 jobs:
-  # build:
-  #   docker:
-  #     - image: docker:17.05.0-ce-git
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker:
-  #         docker_layer_caching: true
-  #     - run:
-  #         name: Docker build and push
-  #         command: |
-  #           TAG=release-$CIRCLE_SHA1
-  #           docker build \
-  #             --build-arg COMMIT_REF=${CIRCLE_SHA1} \
-  #             --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
-  #             -t gocreating/cubee-api-server:$TAG .
-  #           docker login -u $DOCKER_USER -p $DOCKER_PASS
-  #           docker push gocreating/cubee-api-server:$TAG
-
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
@@ -50,17 +32,50 @@ jobs:
               -t gocreating/cubee-api-server:$TAG .
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push gocreating/cubee-api-server:$TAG
+      # - run:
+      #     name: Deploy to Kubernetes
+      #     command: |
+      #       kubectl create secret docker-registry tmp-registry \
+      #         --docker-server=$DOCKER_REGISTRY_SERVER \
+      #         --docker-username=$DOCKER_USER \
+      #         --docker-password=$DOCKER_PASS
+      #       envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
+      #       kubectl apply -f ${HOME}/patched_k8s.yml
+      #       kubectl delete secret tmp-registry
+      #       kubectl rollout status deployment/${PROJECT_NAME}
       - run:
-          name: Deploy to Kubernetes
+          name: Get the kubeconfig file
           command: |
             kubectl create secret docker-registry tmp-registry \
               --docker-server=$DOCKER_REGISTRY_SERVER \
               --docker-username=$DOCKER_USER \
               --docker-password=$DOCKER_PASS
-            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
-            kubectl apply -f ${HOME}/patched_k8s.yml
+            envsubst < ${HOME}/project/helm-chart/${PROJECT_NAME}/values-prod.yml > ${HOME}/project/helm-chart/${PROJECT_NAME}/values.yml
+            export KUBECONFIG=$HOME/.kube/kubeconfig
             kubectl delete secret tmp-registry
-            kubectl rollout status deployment/${PROJECT_NAME}
+      - run:
+          name: Install and configuire helm
+          command: sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz | tar xz && sudo mv linux-amd64/helm /bin/helm && sudo rm -rf linux-amd64
+      - run:
+          name: Initialize helm
+          command:  helm init --client-only --kubeconfig=$HOME/.kube/kubeconfig
+      - run:
+          name: Install tiller plugin
+          command: helm plugin install https://github.com/rimusz/helm-tiller --kubeconfig=$HOME/.kube/kubeconfig
+      - run:
+          name: Release using helm chart
+          command: |
+            echo "start tiller"
+            helm tiller start-ci
+            export HELM_HOST=127.0.0.1:44134
+            result=$(eval helm ls | grep ${PROJECT_NAME})
+            if [ $? -ne "0" ]; then
+              helm install --timeout 180 --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+            else
+              helm upgrade --timeout 180 ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+            fi
+            echo "stop tiller"
+            helm tiller stop
 
 workflows:
   version: 2
