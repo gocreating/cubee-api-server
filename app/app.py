@@ -2,7 +2,7 @@ import os
 from flask import Flask, jsonify
 
 app = Flask(__name__)
-app.config['SERVER_NAME'] = 'cubee.cc:8000'
+app.config['SERVER_NAME'] = 'cubee.cc'
 
 @app.route('/')
 def index():
