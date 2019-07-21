@@ -50,7 +50,7 @@ jobs:
               --docker-server=$DOCKER_REGISTRY_SERVER \
               --docker-username=$DOCKER_USER \
               --docker-password=$DOCKER_PASS
-            envsubst < ${HOME}/project/helm-chart/${PROJECT_NAME}/values-prod.yml > ${HOME}/project/helm-chart/${PROJECT_NAME}/values.yml
+            envsubst < ${HOME}/project/helm-chart/${PROJECT_NAME}/values-prod.yaml > ${HOME}/project/helm-chart/${PROJECT_NAME}/values.yaml
             # export KUBECONFIG=$HOME/.kube/kubeconfig
             kubectl delete secret tmp-registry
       - run:
