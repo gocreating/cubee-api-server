@@ -14,5 +14,5 @@ roleRef:
   name: cluster-admin
 subjects:
   - kind: ServiceAccount
-    name: gocreating@gmail.com
+    name: tiller
     namespace: kube-system

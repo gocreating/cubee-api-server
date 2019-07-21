@@ -64,7 +64,7 @@ jobs:
       - run:
           name: initialize helm
           command: |
-            kubectl apply -f rbac-config.yaml
+            kubectl apply -f rbac-config.yaml --user=gocreating@gmail.com
             helm init --service-account tiller --history-max 200
 
       - run:
