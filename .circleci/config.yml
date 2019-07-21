@@ -64,17 +64,9 @@ jobs:
       - run:
           name: initialize helm
           command: |
-            echo "apply rbac"
             kubectl apply -f rbac-config.yaml
-            # kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-
-            echo "del deployment"
             kubectl delete deployment tiller-deploy --namespace=kube-system
-
-            echo "del svc"
             kubectl delete svc tiller-deploy --namespace=kube-system
-
-            echo "init"
             helm init --service-account tiller --history-max 200
 
       - run:
@@ -82,7 +74,9 @@ jobs:
           command: |
             # Make sure we get the latest list of charts
             helm repo update
-            helm install --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+            cd ./helm-chart/${PROJECT_NAME}
+            helm install . --name=${PROJECT_NAME} -f values.yaml
+            # helm install --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
             helm ls
       # - run:
       #     name: Install and configuire helm
