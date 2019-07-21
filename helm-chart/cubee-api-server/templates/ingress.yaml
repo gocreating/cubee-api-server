@@ -20,3 +20,10 @@ spec:
         backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
+  - host: "*.cubee.cc"
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: {{ .Values.project.name }}
+          servicePort: 8000
