@@ -54,30 +54,55 @@ jobs:
             # export KUBECONFIG=$HOME/.kube/kubeconfig
             kubectl delete secret tmp-registry
       - run:
-          name: Install and configuire helm
-          command: curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz | tar xz && mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
-      - run:
-          name: Initialize helm
-          # command:  helm init --client-only --kubeconfig=$HOME/.kube/kubeconfig
-          command:  helm init --client-only
-      - run:
-          name: Install tiller plugin
-          # command: helm plugin install https://github.com/rimusz/helm-tiller --kubeconfig=$HOME/.kube/kubeconfig
-          command: helm plugin install https://github.com/rimusz/helm-tiller
-      - run:
-          name: Release using helm chart
+          name: install helm
           command: |
-            echo "start tiller"
-            helm tiller start-ci
-            export HELM_HOST=127.0.0.1:44134
-            result=$(eval helm ls | grep ${PROJECT_NAME})
-            if [ $? -ne "0" ]; then
-              helm install --timeout 180 --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
-            else
-              helm upgrade --timeout 180 ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
-            fi
-            echo "stop tiller"
-            helm tiller stop
+            echo "install helm"
+            # installs helm with bash commands for easier command line integration
+            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+            # add a service account within a namespace to segregate tiller
+            kubectl --namespace kube-system create sa tiller
+            # create a cluster role binding for tiller
+            kubectl create clusterrolebinding tiller \
+                --clusterrole cluster-admin \
+                --serviceaccount=kube-system:tiller
+
+            echo "initialize helm"
+            # initialized helm within the tiller service account
+            helm init --service-account tiller
+            # updates the repos for Helm repo integration
+            helm repo update
+
+            echo "verify helm"
+            # verify that helm is installed in the cluster
+            kubectl get deploy,svc tiller-deploy -n kube-system
+      - run:
+          name: install chart
+          command: helm install --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+      # - run:
+      #     name: Install and configuire helm
+      #     command: curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz | tar xz && mv linux-amd64/helm /bin/helm && rm -rf linux-amd64
+      # - run:
+      #     name: Initialize helm
+      #     # command:  helm init --client-only --kubeconfig=$HOME/.kube/kubeconfig
+      #     command:  helm init --client-only
+      # - run:
+      #     name: Install tiller plugin
+      #     # command: helm plugin install https://github.com/rimusz/helm-tiller --kubeconfig=$HOME/.kube/kubeconfig
+      #     command: helm plugin install https://github.com/rimusz/helm-tiller
+      # - run:
+      #     name: Release using helm chart
+      #     command: |
+      #       echo "start tiller"
+      #       helm tiller start-ci
+      #       export HELM_HOST=127.0.0.1:44134
+      #       result=$(eval helm ls | grep ${PROJECT_NAME})
+      #       if [ $? -ne "0" ]; then
+      #         helm install --timeout 180 --name ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+      #       else
+      #         helm upgrade --timeout 180 ${PROJECT_NAME} helm-chart/${PROJECT_NAME}
+      #       fi
+      #       echo "stop tiller"
+      #       helm tiller stop
 
 workflows:
   version: 2
