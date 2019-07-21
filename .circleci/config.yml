@@ -57,18 +57,24 @@ jobs:
           name: install helm
           command: |
             echo "install helm"
+
             # installs helm with bash commands for easier command line integration
             curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+
             # add a service account within a namespace to segregate tiller
-            kubectl --namespace kube-system create sa tiller
+            kubectl create serviceaccount --namespace kube-system tiller
+
             # create a cluster role binding for tiller
-            kubectl create clusterrolebinding tiller \
-                --clusterrole cluster-admin \
-                --serviceaccount=kube-system:tiller
+            kubectl create clusterrolebinding tiller-cluster-rule \
+              --clusterrole=cluster-admin \
+              --serviceaccount=kube-system:tiller
+            kubectl patch deploy \
+              --namespace kube-system tiller-deploy \
+              -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
 
             echo "initialize helm"
             # initialized helm within the tiller service account
-            helm init --service-account tiller
+            helm init --service-account tiller --upgrade
             # updates the repos for Helm repo integration
             helm repo update
 
