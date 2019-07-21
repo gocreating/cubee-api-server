@@ -18,3 +18,9 @@ spec:
       - backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
+  - host: cubee.cc
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.project.name }}
+          servicePort: 8000

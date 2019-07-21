@@ -12,22 +12,22 @@ def app_index():
     return 'app index'
 
 #########
-## WWW ##
+## API ##
 #########
-www = Blueprint('www', __name__, subdomain='www')
-@www.route('/')
-def www_index():
+api = Blueprint('api', __name__, subdomain='api')
+@api.route('/')
+def api_index():
     return 'Welcome to Cubee API Server'
 
-@www.route('/hello')
-def hello():
+@api.route('/hello')
+def api_hello():
     return jsonify(
         hello='world',
         num=777,
     )
 
-@www.route('/version')
-def version():
+@api.route('/version')
+def api_version():
     try:
         return jsonify(
             APP_COMMIT_REF=os.environ['APP_COMMIT_REF'],
@@ -36,7 +36,7 @@ def version():
     except:
         return 'unknown'
 
-app.register_blueprint(www)
+app.register_blueprint(api)
 
 #############
 ## Dynamic ##
