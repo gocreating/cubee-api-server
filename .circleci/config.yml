@@ -65,6 +65,7 @@ jobs:
           name: initialize helm
           command: |
             kubectl apply -f rbac-config.yaml
+            kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
             helm init --service-account tiller --history-max 200
 
       - run:
