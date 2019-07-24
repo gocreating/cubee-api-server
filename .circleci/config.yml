@@ -39,7 +39,10 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Fuck
+          name: Fuck1
+          command: pwd
+      - run:
+          name: Fuck2
           command: ls -al
       - run:
           name: Docker build and push
