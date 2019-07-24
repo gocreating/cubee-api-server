@@ -6,3 +6,6 @@ services:
       - "8000:8000"
     volumes:
       - .:/srv/cubee-api-server
+      - ./config-stg.yaml:/etc/config.yaml
+    environment:
+      - FLASK_ENV=development

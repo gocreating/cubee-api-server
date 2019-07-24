@@ -13,3 +13,20 @@
 ```
 $ FLASK_ENV=development python app/app.py
 ```
+
+## Encryption/Decryption Sensitive File with Ansible-Vault
+
+1. Build ansible image
+
+```
+$ docker build -t gocreating/ansible-vault -f ansible-vault-dockerfile .
+```
+
+2. Encrypt/Decrypt
+
+```
+$ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault encrypt ./configMap-prod.yaml
+$ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault encrypt ./configMap-stg.yaml
+$ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault decrypt ./configMap-prod.yaml
+$ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault decrypt ./configMap-stg.yaml
+```

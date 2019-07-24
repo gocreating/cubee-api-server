@@ -107,6 +107,8 @@ venv.bak/
 webapp/config.ini
 webapp/logs/log.dat
 *.dat
+config-prod.yaml
+config-stg.yaml
 
 # IDE
 .idea/
