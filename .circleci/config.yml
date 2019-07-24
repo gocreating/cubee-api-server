@@ -37,8 +37,8 @@ jobs:
           name: Fuck1
           command: |
             pwd
-            ls /my-workspace
-            cat /my-workspace/configMap-prod.yaml
+            ls ./my-workspace
+            cat ./my-workspace/configMap-prod.yaml
       - run:
           name: Fuck2
           command: ls -al
