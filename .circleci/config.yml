@@ -3,6 +3,7 @@ jobs:
   decrypt_helm_values:
     docker:
       - image: gocreating/ansible-vault
+    working_directory: ~/fuck-circle-ci
     environment:
     - PROJECT_NAME: "cubee-api-server"
     steps:
@@ -18,6 +19,7 @@ jobs:
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
+    working_directory: ~/fuck-circle-ci
     environment:
       - PROJECT_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
