@@ -11,6 +11,7 @@ jobs:
       - run:
           name: Decrypt
           command: |
+            mkdir -p /my-workspace
             echo $ANSIBLE_VAULT_PASSWORD > /root/ansible_vault.key
             ansible-vault decrypt \
               ./helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
