@@ -39,13 +39,17 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
+          name: Fuck
+          command: ls -al
+      - run:
           name: Docker build and push
           command: |
             TAG=release-$CIRCLE_SHA1
             docker build \
               --build-arg COMMIT_REF=${CIRCLE_SHA1} \
               --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
-              -t gocreating/cubee-api-server:$TAG .
+              -t gocreating/cubee-api-server:$TAG \
+              -f ./Dockerfile .
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push gocreating/cubee-api-server:$TAG
       # - run:
@@ -66,7 +70,7 @@ jobs:
               --docker-server=$DOCKER_REGISTRY_SERVER \
               --docker-username=$DOCKER_USER \
               --docker-password=$DOCKER_PASS
-            envsubst < ${HOME}/project/helm-chart/${PROJECT_NAME}/values-prod.yaml > ${HOME}/project/helm-chart/${PROJECT_NAME}/values.yaml
+            envsubst < ./helm-chart/${PROJECT_NAME}/values-prod.yaml > ./helm-chart/${PROJECT_NAME}/values.yaml
             kubectl delete secret tmp-registry
       - run:
           name: install helm
