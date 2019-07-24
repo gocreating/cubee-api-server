@@ -25,7 +25,6 @@ jobs:
       - GOOGLE_CLUSTER_NAME: "cubee-production"
       - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
-      - checkout
       - run:
           name: Setup Google Cloud SDK
           command: |
