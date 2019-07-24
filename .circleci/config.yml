@@ -16,13 +16,10 @@ jobs:
               ./helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
               --output ./helm-chart/${PROJECT_NAME}/templates/configMap-prod.yaml \
               --vault-password-file=/root/ansible_vault.key
-      - store_artifacts:
-          path: ~/fuck-circle-ci
-          destination: /pass
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
-    working_directory: /pass
+    working_directory: ~/fuck-circle-ci
     environment:
       - PROJECT_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
@@ -30,6 +27,16 @@ jobs:
       - GOOGLE_CLUSTER_NAME: "cubee-production"
       - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
+      - checkout
+      - run:
+          name: Fuck1
+          command: pwd
+      - run:
+          name: Fuck2
+          command: ls -al
+      - run:
+          name: Fuck3
+          command: ls ./helm-chart/${PROJECT_NAME} -al
       - run:
           name: Setup Google Cloud SDK
           command: |
@@ -41,12 +48,7 @@ jobs:
             gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
       - setup_remote_docker:
           docker_layer_caching: true
-      - run:
-          name: Fuck1
-          command: pwd
-      - run:
-          name: Fuck2
-          command: ls -al
+
       - run:
           name: Docker build and push
           command: |
