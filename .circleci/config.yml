@@ -22,6 +22,8 @@ jobs:
           root: ./my-workspace
           paths:
             - configMap-prod.yaml
+
+
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
@@ -33,19 +35,17 @@ jobs:
       - GOOGLE_CLUSTER_NAME: "cubee-production"
       - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
+      - checkout
       - attach_workspace:
           at: ./my-workspace
       - run:
           name: Fuck1
           command: |
             pwd
-            ls -al
-            echo ''
-            ls ./my-workspace -al
-            cat ./configMap-prod.yaml
+            cat ./my-workspace/configMap-prod.yaml
       - run:
           name: Fuck2
-          command: ls -al
+          command: cp ./my-workspace/configMap-prod.yaml ./helm-chart/${PROJECT_NAME}/templates/configMap.yaml
       - run:
           name: Fuck3
           command: ls ./helm-chart/${PROJECT_NAME}/templates -al
