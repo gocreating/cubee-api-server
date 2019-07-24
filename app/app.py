@@ -1,6 +1,8 @@
 import os
+import yaml
 from flask import Flask, Blueprint, jsonify
 
+config_dict = yaml.load(open('/etc/config.yaml'))
 app = Flask(__name__, subdomain_matching=True)
 app.config['SERVER_NAME'] = 'cubee.cc'
 
@@ -29,6 +31,10 @@ def api_hello():
         hello='world',
         num=777,
     )
+
+@api.route('/config')
+def api_config():
+    return jsonify(config_dict)
 
 @api.route('/version')
 def api_version():

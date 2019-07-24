@@ -27,3 +27,11 @@ spec:
             httpGet:
               path: {{ .Values.healthz.path | default "/" }}
               port: http
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config.yaml
+          subPath: config.yaml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: credential-config

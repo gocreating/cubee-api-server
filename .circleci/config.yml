@@ -1,12 +1,27 @@
 version: 2
 jobs:
+  decrypt_helm_values:
+    docker:
+      - image: gocreating/ansible-vault
+    environment:
+    - PROJECT_NAME: "cubee-api-server"
+    steps:
+      - checkout
+      - run:
+          name: Decrypt
+          command: |
+            echo $ANSIBLE_VAULT_PASSWORD > /root/ansible_vault.key
+            ansible-vault decrypt \
+              /project/helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
+              --output /project/helm-chart/${PROJECT_NAME}/configMap.yaml \
+              --vault-password-file=/root/ansible_vault.key
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
     environment:
       - PROJECT_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
-      - GOOGLE_COMPUTE_ZONE: "us-west1-a	"
+      - GOOGLE_COMPUTE_ZONE: "us-west1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-production"
       - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
@@ -81,7 +96,10 @@ workflows:
   version: 2
   build_image_and_deploy:
     jobs:
+      - decrypt_helm_values
       - deploy_to_production:
+          requires:
+            - decrypt_helm_values
           filters:
             branches:
               only: master
