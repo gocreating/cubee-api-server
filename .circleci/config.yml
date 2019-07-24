@@ -15,7 +15,7 @@ jobs:
             echo $ANSIBLE_VAULT_PASSWORD > /root/ansible_vault.key
             ansible-vault decrypt \
               ./helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
-              --output ./helm-chart/${PROJECT_NAME}/templates/configMap-prod.yaml \
+              --output /my-workspace/configMap-prod.yaml \
               --vault-password-file=/root/ansible_vault.key
       - persist_to_workspace:
           root: /my-workspace
