@@ -8,6 +8,7 @@ jobs:
     - PROJECT_NAME: "cubee-api-server"
     steps:
       - checkout
+      - run: apk add ca-certificates
       - run:
           name: Decrypt
           command: |
@@ -32,13 +33,16 @@ jobs:
       - GOOGLE_CLUSTER_NAME: "cubee-production"
       - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
-      - checkout
+      - attach_workspace:
+          at: ./my-workspace
       - run:
           name: Fuck1
           command: |
             pwd
-            ls ./my-workspace
-            cat ./my-workspace/configMap-prod.yaml
+            ls -al
+            echo ''
+            ls ./my-workspace -al
+            cat ./configMap-prod.yaml
       - run:
           name: Fuck2
           command: ls -al
