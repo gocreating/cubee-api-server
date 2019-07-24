@@ -12,8 +12,8 @@ jobs:
           command: |
             echo $ANSIBLE_VAULT_PASSWORD > /root/ansible_vault.key
             ansible-vault decrypt \
-              /project/helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
-              --output /project/helm-chart/${PROJECT_NAME}/configMap.yaml \
+              ${HOME}/project/helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
+              --output ${HOME}/project/helm-chart/${PROJECT_NAME}/configMap.yaml \
               --vault-password-file=/root/ansible_vault.key
   deploy_to_production:
     docker:
