@@ -8,6 +8,7 @@ jobs:
     - PROJECT_NAME: "cubee-api-server"
     steps:
       - checkout
+      # https://support.circleci.com/hc/en-us/articles/360016505753-Resolve-Certificate-Signed-By-Unknown-Authority-error-in-Alpine-images
       - run: apk add ca-certificates
       - run:
           name: Decrypt
