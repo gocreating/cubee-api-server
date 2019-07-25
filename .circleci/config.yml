@@ -33,7 +33,7 @@ jobs:
       - PROJECT_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
       - GOOGLE_COMPUTE_ZONE: "us-west1-a"
-      - GOOGLE_CLUSTER_NAME: "cubee-production"
+      - GOOGLE_CLUSTER_NAME: "cubee-prod"
       - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
       - checkout
