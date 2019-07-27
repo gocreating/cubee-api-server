@@ -44,8 +44,12 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
+    @app.route('/config')
+    def config():
+        return jsonify(config_dict)
+
     @app.route('/')
     def index():
-        return jsonify(config_dict)
+        return 'Yo, this is cubee.cc'
 
     return app
