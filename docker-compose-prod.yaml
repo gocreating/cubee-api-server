@@ -4,12 +4,9 @@ services:
     build: .
     ports:
       # external port: internal port
-      - "8000:5000"
+      - "8000:8000"
     volumes:
       - .:/srv/cubee-api-server
-      - ./config-stg.yaml:/etc/config.yaml
+      - ./config-prod.yaml:/etc/config.yaml
     environment:
       - FLASK_APP=app
-      - FLASK_ENV=development
-    entrypoint: flask
-    command: "run --host=0.0.0.0"
