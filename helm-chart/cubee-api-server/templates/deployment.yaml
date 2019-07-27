@@ -19,9 +19,9 @@ spec:
       containers:
       - name: {{ .Values.project.name }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        resources:
-          requests:
-            memory: "80Mi"
+        # resources:
+        #   requests:
+        #     memory: "80Mi"
         ports:
         - name: http
           containerPort: 8000
