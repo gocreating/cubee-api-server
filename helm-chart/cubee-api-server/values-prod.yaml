@@ -17,3 +17,8 @@ healthz:
   timeout: 10
   success: 1
   failure: 3
+
+autoScaling:
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
