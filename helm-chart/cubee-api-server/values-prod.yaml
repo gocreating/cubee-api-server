@@ -12,3 +12,8 @@ pod:
 
 healthz:
   path: /
+  initialDelay: 15
+  period: 15
+  timeout: 10
+  success: 1
+  failure: 3
