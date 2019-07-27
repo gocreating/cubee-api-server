@@ -15,7 +15,7 @@ class User(Base):
         self.password = password
 
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return '<User %r>' % (self.username)
 
 class Post(Base):
     __tablename__ = 'posts'
@@ -24,3 +24,11 @@ class Post(Base):
     created = Column(DateTime, default=func.now())
     title = Column(String(30))
     body = Column(String(120))
+
+    def __init__(self, author_id=None, title=None, body=None):
+        self.author_id = author_id
+        self.title = title
+        self.body = body
+
+    def __repr__(self):
+        return '<Post %r>' % (self.title)
