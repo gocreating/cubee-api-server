@@ -12,6 +12,9 @@ spec:
   #   - cubee.cc
   #   - api.cubee.cc
   #   secretName: {{ .Values.secret.tlsName }}
+  tls:
+  - secretName: cubee-cc-tls
+  - secretName: sub-cubee-cc-tls
   rules:
   # can redirect cubee.cc, mutate with next rule
   - host: cubee.cc
