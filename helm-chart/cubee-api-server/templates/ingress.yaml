@@ -6,14 +6,14 @@ metadata:
     kubernetes.io/ingress.class: nginx
     acme.kubernetes.io/enable: "true"
     acme.kubernetes.io/dns: "dns_gd"
-    acme.kubernetes.io/staging: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
     # networking.gke.io/managed-certificates: {{ .Values.project.name }}
     # ingress.gcp.kubernetes.io/pre-shared-cert: "cubee-ingress"
 spec:
   tls:
   - hosts:
-      - cubee.cc
-      - "*.cubee.cc"
+    - cubee.cc
+    - api.cubee.cc
     secretName: {{ .Values.secret.tlsName }}
   rules:
   # can redirect cubee.cc, mutate with next rule
