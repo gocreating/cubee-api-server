@@ -3,9 +3,10 @@ kind: Ingress
 metadata:
   name: {{ .Values.project.name }}
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: "ingress-prod"
+    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/ingress.global-static-ip-name: "nginx-ingress-prod"
     # networking.gke.io/managed-certificates: {{ .Values.project.name }}
-    ingress.gcp.kubernetes.io/pre-shared-cert: "cubee-ingress"
+    # ingress.gcp.kubernetes.io/pre-shared-cert: "cubee-ingress"
 spec:
   rules:
   # can redirect cubee.cc, mutate with next rule

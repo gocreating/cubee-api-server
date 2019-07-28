@@ -28,9 +28,43 @@ $ kubectl -n kube-system get po
 
 如果有，可以rerun看看ci的job
 
-### DNS
+### Nginx Ingress Controller
 
-要將ingress的ip從`臨時`改為`靜態`，給定名字後修改`ingress.yaml`裡的`kubernetes.io/ingress.global-static-ip-name`
+[NGINX Ingress Controller Installation Guide](https://kubernetes.github.io/ingress-nginx/deploy/)
+
+``` bash
+$ kubectl create clusterrolebinding cluster-admin-binding \
+  --clusterrole cluster-admin \
+  --user $(gcloud config get-value account)
+Your active configuration is: [cloudshell-24112]
+clusterrolebinding.rbac.authorization.k8s.io/cluster-admin-binding created
+
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+namespace/ingress-nginx created
+configmap/nginx-configuration created
+configmap/tcp-services created
+configmap/udp-services created
+serviceaccount/nginx-ingress-serviceaccount created
+clusterrole.rbac.authorization.k8s.io/nginx-ingress-clusterrole created
+role.rbac.authorization.k8s.io/nginx-ingress-role created
+rolebinding.rbac.authorization.k8s.io/nginx-ingress-role-nisa-binding created
+clusterrolebinding.rbac.authorization.k8s.io/nginx-ingress-clusterrole-nisa-binding created
+deployment.apps/nginx-ingress-controller created
+
+$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
+service/ingress-nginx created
+```
+
+檢查是否有安裝正確
+``` bash
+$ kubectl get service ingress-nginx --namespace=ingress-nginx
+NAME            TYPE           CLUSTER-IP   EXTERNAL-IP   PORT(S)                      AGE
+ingress-nginx   LoadBalancer   10.28.5.20   <pending>     80:31222/TCP,443:30889/TCP   29s
+```
+
+### 將LB的IP改為Static並設定DNS
+
+接著要將ingress的ip從`臨時`改為`靜態`，給定名字後（例如`nginx-ingress-prod`）修改`ingress.yaml`裡的`kubernetes.io/ingress.global-static-ip-name`
 接著就可以到域名服務商把domain指向這個靜態IP了
 
 ### 關閉不必要的外掛
