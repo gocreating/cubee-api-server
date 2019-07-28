@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   name: {{ .Values.project.name }}
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    kubernetes.io/ingress.global-static-ip-name: "nginx-ingress-prod"
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/ingress.global-static-ip-name: "nginx-ingress-prod"
     # networking.gke.io/managed-certificates: {{ .Values.project.name }}
     # ingress.gcp.kubernetes.io/pre-shared-cert: "cubee-ingress"
 spec:
@@ -13,7 +13,8 @@ spec:
   - host: cubee.cc
     http:
       paths:
-      - path: /*
+      # - path: /*
+      - path: /
         backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
@@ -30,7 +31,8 @@ spec:
   - host: api.cubee.cc
     http:
       paths:
-      - path: /*
+      # - path: /*
+      - path: /
         backend:
           serviceName: {{ .Values.project.name }}
           servicePort: 8000
