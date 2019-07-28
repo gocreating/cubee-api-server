@@ -64,8 +64,7 @@ ingress-nginx   LoadBalancer   10.28.5.20   <pending>     80:31222/TCP,443:30889
 
 ### 將LB的IP改為Static並設定DNS
 
-接著要將ingress的ip從`臨時`改為`靜態`，給定名字後（例如`nginx-ingress-prod`）修改`ingress.yaml`裡的`kubernetes.io/ingress.global-static-ip-name`
-接著就可以到域名服務商把domain指向這個靜態IP了
+接著要將ingress的ip從`臨時`改為`靜態`，給定名字後（例如`nginx-ingress-prod`）就可以到域名服務商把domain指向這個靜態IP了
 
 ### 關閉不必要的外掛
 
