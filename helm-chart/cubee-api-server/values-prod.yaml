@@ -2,7 +2,7 @@ project:
   name: cubee-api-server
 
 googleProject:
-  name: cubee-247317
+  name: cubee
 
 image:
   repository: gocreating/cubee-api-server
@@ -25,6 +25,3 @@ autoScaling:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-
-secret:
-  tlsName: cubee-cc-tls

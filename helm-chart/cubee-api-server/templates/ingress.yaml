@@ -7,14 +7,11 @@ metadata:
     # networking.gke.io/managed-certificates: {{ .Values.project.name }}
     # ingress.gcp.kubernetes.io/pre-shared-cert: "cubee-ingress"
 spec:
-  # tls:
-  # - hosts:
-  #   - cubee.cc
-  #   - api.cubee.cc
-  #   secretName: {{ .Values.secret.tlsName }}
-  # tls:
-  # - secretName: cubee-cc-tls
-  # - secretName: sub-cubee-cc-tls
+  tls:
+    - secretName: cubee-cc-tls
+      hosts:
+        - cubee.cc
+        - "*.cubee.cc"
   rules:
   # can redirect cubee.cc, mutate with next rule
   - host: cubee.cc
