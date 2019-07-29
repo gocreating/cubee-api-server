@@ -49,7 +49,7 @@ metadata:
 spec:
   secretName: cubee-cc-tls
   issuerRef:
-    name: letsencrypt-private-key-secret
+    name: letsencrypt-{{ .Values.project.name }}
     kind: ClusterIssuer
   commonName: cubee.cc
   dnsNames:
