@@ -1,6 +1,9 @@
 project:
   name: cubee-api-server
 
+googleProject:
+  name: cubee-247317
+
 image:
   repository: gocreating/cubee-api-server
   tag: release-${CIRCLE_SHA1}
