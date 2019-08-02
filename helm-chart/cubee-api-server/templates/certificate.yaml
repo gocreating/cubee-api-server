@@ -1,20 +1,20 @@
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: cubee-cc
-spec:
-  secretName: cubee-cc-tls
-  issuerRef:
-    name: letsencrypt-issuer
-    kind: ClusterIssuer
-  commonName: cubee.cc
-  dnsNames:
-    - cubee.cc
-    - "*.cubee.cc"
-  acme:
-    config:
-      - dns01:
-          provider: clouddns
-        domains:
-          - cubee.cc
-          - "*.cubee.cc"
+# apiVersion: certmanager.k8s.io/v1alpha1
+# kind: Certificate
+# metadata:
+#   name: cubee-cc
+# spec:
+#   secretName: cubee-cc-tls
+#   issuerRef:
+#     name: letsencrypt-issuer
+#     kind: ClusterIssuer
+#   commonName: cubee.cc
+#   dnsNames:
+#     - cubee.cc
+#     - "*.cubee.cc"
+#   acme:
+#     config:
+#       - dns01:
+#           provider: clouddns
+#         domains:
+#           - cubee.cc
+#           - "*.cubee.cc"
