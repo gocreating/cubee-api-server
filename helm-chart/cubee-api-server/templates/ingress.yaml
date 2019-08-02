@@ -4,8 +4,6 @@ metadata:
   name: {{ .Values.project.name }}
   annotations:
     kubernetes.io/ingress.class: nginx
-    # networking.gke.io/managed-certificates: {{ .Values.project.name }}
-    # ingress.gcp.kubernetes.io/pre-shared-cert: "cubee-ingress"
 spec:
   tls:
     - secretName: cubee-cc-tls
