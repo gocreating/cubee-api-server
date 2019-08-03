@@ -11,28 +11,4 @@ spec:
         - cubee.cc
         - "*.cubee.cc"
   rules:
-  # can redirect cubee.cc, mutate with next rule
-  - host: cubee.cc
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: {{ .Values.project.name }}
-          servicePort: 8000
-
-  # can redirect <any-sub-domain>.cubee.cc, mutate with previous rule
-  # - host: www.cubee.cc
-  #   http:
-  #     paths:
-  #     - path: /*
-  #       backend:
-  #         serviceName: {{ .Values.project.name }}
-  #         servicePort: 8000
-
-  - host: api.cubee.cc
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: {{ .Values.project.name }}
-          servicePort: 8000
+{{ toYaml .Values.ingress.rules | indent 4 }}

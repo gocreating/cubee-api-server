@@ -2,7 +2,6 @@ project:
   name: cubee-api-server
 
 image:
-  # repository: docker.io/gocreating/cubee-api-server
   repository: gocreating/cubee-api-server
   tag: ${IMAGE_TAG}
 
@@ -23,3 +22,31 @@ autoScaling:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
+
+ingress:
+  rules:
+    # can redirect cubee.cc, mutate with next rule
+    - host: cubee.cc
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: cubee-api-server
+            servicePort: 8000
+
+    # can redirect <any-sub-domain>.cubee.cc, mutate with previous rule
+    # - host: www.cubee.cc
+    #   http:
+    #     paths:
+    #     - path: /*
+    #       backend:
+    #         serviceName: cubee-api-server
+    #         servicePort: 8000
+
+    - host: api.cubee.cc
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: cubee-api-server
+            servicePort: 8000

@@ -1,5 +1,6 @@
 version: 2.1
 
+# https://circleci.com/docs/2.0/reusing-config/
 commands:
   deploy:
     description: "Deploy to GKE"
@@ -14,7 +15,6 @@ commands:
       - run:
           name: Retrieve Persisted Environment Variable
           command: |
-            # source ./my-persist-workspace/persist-env-var.txt
             cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
             echo $IMAGE_TAG
       - run:
@@ -43,6 +43,7 @@ commands:
           command: |
             helm repo update
             cd ./helm-chart/${HELM_CHART_NAME}
+            cat values.yaml
             helm upgrade ${HELM_CHART_NAME} . -f values.yaml --install --force
             helm ls
 
@@ -114,6 +115,20 @@ jobs:
             - configMap-prod.yaml
             - configMap-stg.yaml
 
+  deploy_to_staging:
+    docker:
+      - image: google/cloud-sdk
+    working_directory: ~/my-working-directory
+    environment:
+      - PROJECT_NAME: "cubee-api-server"
+      - HELM_CHART_NAME: "cubee-api-server"
+      - GOOGLE_PROJECT_ID: "cubee-247317"
+      - GOOGLE_COMPUTE_ZONE: "us-west1-a"
+      - GOOGLE_CLUSTER_NAME: "cubee-stg"
+    steps:
+      - deploy:
+          helmValueFileName: "values-stg.yaml"
+
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
@@ -144,12 +159,18 @@ workflows:
               only: master
             tags:
               only: /release-.*/
-      - deploy_to_production:
+      - deploy_to_staging:
           requires:
             - build_docker_image
             - decrypt_secrets
           filters:
             branches:
               only: master
+      - deploy_to_production:
+          requires:
+            - build_docker_image
+            - decrypt_secrets
+            - deploy_to_staging
+          filters:
             tags:
               only: /release-.*/
