@@ -33,6 +33,7 @@ $ kubectl -n kube-system get po
 [NGINX Ingress Controller Installation Guide](https://kubernetes.github.io/ingress-nginx/deploy/)
 
 ``` bash
+# 這個只有在第一個cluster建立時執行一次即可，第二個cluster就不用執行了
 $ kubectl create clusterrolebinding cluster-admin-binding \
   --clusterrole cluster-admin \
   --user $(gcloud config get-value account)

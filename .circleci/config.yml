@@ -7,7 +7,7 @@ commands:
     parameters:
       helmValueFileName:
         type: string
-        default: "values-prod.yaml"
+        default: "values-stg.yaml"
     steps:
       - checkout
       - attach_workspace:
