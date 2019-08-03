@@ -1,4 +1,51 @@
-version: 2
+version: 2.1
+
+commands:
+  deploy:
+    description: "Deploy to GKE"
+    parameters:
+      helmValueFileName:
+        type: string
+        default: "values-prod.yaml"
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ./my-persist-workspace
+      - run:
+          name: Retrieve Persisted Environment Variable
+          command: |
+            # source ./my-persist-workspace/persist-env-var.txt
+            cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
+            echo $IMAGE_TAG
+      - run:
+          name: Setup Decrypted Files
+          command: |
+            mv ./my-persist-workspace/configMap-prod.yaml ./helm-chart/${HELM_CHART_NAME}/templates/configMap.yaml
+            apt-get install -qq -y gettext
+            envsubst < ./helm-chart/${HELM_CHART_NAME}/<< parameters.helmValueFileName >> > ./helm-chart/${HELM_CHART_NAME}/values.yaml
+      - run:
+          name: Setup Google Cloud SDK
+          command: |
+            echo $GCLOUD_SERVICE_KEY > ./gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=./gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+            rm ./gcloud-service-key.json
+      - run:
+          name: Setup Helm
+          command: |
+            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+            kubectl apply -f rbac-config.yaml
+            helm init --service-account tiller --history-max 200
+      - run:
+          name: Install Chart
+          command: |
+            helm repo update
+            cd ./helm-chart/${HELM_CHART_NAME}
+            helm upgrade ${HELM_CHART_NAME} . -f values.yaml --install --force
+            helm ls
+
 jobs:
   build_docker_image:
     docker:
@@ -20,8 +67,6 @@ jobs:
       - run:
           name: Build Docker Image
           command: |
-            # cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
-            echo $IMAGE_TAG
             docker build \
               --build-arg PROJECT_REPONAME=${CIRCLE_PROJECT_REPONAME} \
               --build-arg SHA1=${CIRCLE_SHA1} \
@@ -80,43 +125,8 @@ jobs:
       - GOOGLE_COMPUTE_ZONE: "us-west1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-prod"
     steps:
-      - checkout
-      - attach_workspace:
-          at: ./my-persist-workspace
-      - run:
-          name: Retrieve Persisted Environment Variable
-          command: |
-            # source ./my-persist-workspace/persist-env-var.txt
-            cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
-            echo $IMAGE_TAG
-      - run:
-          name: Setup Decrypted Files
-          command: |
-            mv ./my-persist-workspace/configMap-prod.yaml ./helm-chart/${HELM_CHART_NAME}/templates/configMap.yaml
-            apt-get install -qq -y gettext
-            envsubst < ./helm-chart/${HELM_CHART_NAME}/values-prod.yaml > ./helm-chart/${HELM_CHART_NAME}/values.yaml
-      - run:
-          name: Setup Google Cloud SDK
-          command: |
-            echo $GCLOUD_SERVICE_KEY > ./gcloud-service-key.json
-            gcloud auth activate-service-account --key-file=./gcloud-service-key.json
-            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
-            rm ./gcloud-service-key.json
-      - run:
-          name: Setup Helm
-          command: |
-            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
-            kubectl apply -f rbac-config.yaml
-            helm init --service-account tiller --history-max 200
-      - run:
-          name: Install Chart
-          command: |
-            helm repo update
-            cd ./helm-chart/${HELM_CHART_NAME}
-            helm upgrade ${HELM_CHART_NAME} . -f values.yaml --install --force
-            helm ls
+      - deploy:
+          helmValueFileName: "values-prod.yaml"
 
 workflows:
   version: 2
