@@ -17,17 +17,15 @@ jobs:
             touch ./my-persist-workspace/persist-env-var.txt
             echo "export IMAGE_TAG=$TAG" > ./my-persist-workspace/persist-env-var.txt
             cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
-            echo $IMAGE_TAG
-      # - attach_workspace:
-      #     at: ./my-persist-workspace
       - run:
           name: Build Docker Image
           command: |
-            cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
+            # cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
+            echo $IMAGE_TAG
             docker build \
               --build-arg PROJECT_REPONAME=${CIRCLE_PROJECT_REPONAME} \
               --build-arg SHA1=${CIRCLE_SHA1} \
-              --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
+              --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
               --build-arg IMAGE_TAG=${IMAGE_TAG} \
               -t gocreating/cubee-api-server:${IMAGE_TAG} \
               -f ./Dockerfile .
