@@ -166,11 +166,15 @@ workflows:
           filters:
             branches:
               only: master
+            tags:
+              only: /release-.*/
       - deploy_to_production:
           requires:
             - build_docker_image
             - decrypt_secrets
             - deploy_to_staging
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /release-.*/
