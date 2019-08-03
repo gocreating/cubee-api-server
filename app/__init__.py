@@ -52,9 +52,8 @@ def create_app(test_config=None):
         return jsonify(
             repoName=os.environ['repoName'],
             commitSHA1=os.environ['commitSHA1'],
-            buildNumber=os.environ['buildNumber'],
-            buildURL=os.environ['buildURL'],
             buildDate=os.environ['buildDate'],
+            imageTag=os.environ['imageTag'],
         )
 
     @app.route('/')

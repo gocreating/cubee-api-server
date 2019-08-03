@@ -4,9 +4,8 @@ FROM alpine:3.7
 
 ARG PROJECT_REPONAME
 ARG SHA1
-ARG BUILD_NUM
-ARG BUILD_URL
 ARG BUILD_DATE
+ARG IMAGE_TAG
 
 COPY requirements.txt /tmp/requirements.txt
 
@@ -22,9 +21,8 @@ WORKDIR /srv/cubee-api-server
 
 ENV repoName=${PROJECT_REPONAME} \
     commitSHA1=${SHA1} \
-    buildNumber=${BUILD_NUM} \
-    buildURL=${BUILD_URL} \
-    buildDate=${BUILD_DATE}
+    buildDate=${BUILD_DATE} \
+    imageTag=${IMAGE_TAG}
 
 EXPOSE 8000
 

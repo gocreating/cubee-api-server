@@ -1,11 +1,52 @@
 version: 2
 jobs:
+  build_docker_image:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Setup Environment Variable
+          command: |
+            # https://discuss.circleci.com/t/using-environment-variables-in-config-yml-not-working/14237
+            # https://circleci.com/docs/2.0/migrating-from-1-2/#search-and-replace-deprecated-20-keys
+            TAG=release-$(echo $CIRCLE_SHA1 | cut -c 1-8)-$CIRCLE_BUILD_NUM
+            mkdir -p ./my-persist-workspace
+            touch ./my-persist-workspace/persist-env-var.txt
+            echo "export IMAGE_TAG=$TAG" > ./my-persist-workspace/persist-env-var.txt
+            cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
+            echo $IMAGE_TAG
+      # - attach_workspace:
+      #     at: ./my-persist-workspace
+      - run:
+          name: Build Docker Image
+          command: |
+            cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
+            docker build \
+              --build-arg PROJECT_REPONAME=${CIRCLE_PROJECT_REPONAME} \
+              --build-arg SHA1=${CIRCLE_SHA1} \
+              --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
+              --build-arg IMAGE_TAG=${IMAGE_TAG} \
+              -t gocreating/cubee-api-server:${IMAGE_TAG} \
+              -f ./Dockerfile .
+      - run:
+          name: Push Docker Image
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push gocreating/cubee-api-server:$IMAGE_TAG
+      - persist_to_workspace:
+          root: ./my-persist-workspace
+          paths:
+            - persist-env-var.txt
+
   decrypt_secrets:
     docker:
       - image: gocreating/ansible-vault
     working_directory: ~/my-working-directory
     environment:
-    - PROJECT_NAME: "cubee-api-server"
+      - HELM_CHART_NAME: "cubee-api-server"
     steps:
       - checkout
       # https://support.circleci.com/hc/en-us/articles/360016505753-Resolve-Certificate-Signed-By-Unknown-Authority-error-in-Alpine-images
@@ -16,14 +57,19 @@ jobs:
             mkdir -p ./my-persist-workspace
             echo $ANSIBLE_VAULT_PASSWORD > /root/ansible_vault.key
             ansible-vault decrypt \
-              ./helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
+              ./helm-chart/${HELM_CHART_NAME}/configMap-prod.yaml \
               --output ./my-persist-workspace/configMap-prod.yaml \
+              --vault-password-file=/root/ansible_vault.key
+            ansible-vault decrypt \
+              ./helm-chart/${HELM_CHART_NAME}/configMap-stg.yaml \
+              --output ./my-persist-workspace/configMap-stg.yaml \
               --vault-password-file=/root/ansible_vault.key
             rm /root/ansible_vault.key
       - persist_to_workspace:
           root: ./my-persist-workspace
           paths:
             - configMap-prod.yaml
+            - configMap-stg.yaml
 
   deploy_to_production:
     docker:
@@ -39,6 +85,12 @@ jobs:
       - checkout
       - attach_workspace:
           at: ./my-persist-workspace
+      - run:
+          name: Retrieve Persisted Environment Variable
+          command: |
+            # source ./my-persist-workspace/persist-env-var.txt
+            cat ./my-persist-workspace/persist-env-var.txt >> $BASH_ENV
+            echo $IMAGE_TAG
       - run:
           name: Setup Decrypted Files
           command: |
@@ -60,22 +112,6 @@ jobs:
             curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
             kubectl apply -f rbac-config.yaml
             helm init --service-account tiller --history-max 200
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Deploy Docker Image
-          command: |
-            TAG=release-$CIRCLE_BUILD_NUM
-            docker build \
-              --build-arg PROJECT_REPONAME=${CIRCLE_PROJECT_REPONAME} \
-              --build-arg SHA1=${CIRCLE_SHA1} \
-              --build-arg BUILD_NUM=${CIRCLE_BUILD_NUM} \
-              --build-arg BUILD_URL=${CIRCLE_BUILD_URL} \
-              --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
-              -t gocreating/cubee-api-server:$TAG \
-              -f ./Dockerfile .
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push gocreating/cubee-api-server:$TAG
       - run:
           name: Install Chart
           command: |
@@ -88,10 +124,24 @@ workflows:
   version: 2
   build_image_and_deploy:
     jobs:
-      - decrypt_secrets
+      - build_docker_image:
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /release-.*/
+      - decrypt_secrets:
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /release-.*/
       - deploy_to_production:
           requires:
+            - build_docker_image
             - decrypt_secrets
           filters:
             branches:
               only: master
+            tags:
+              only: /release-.*/
