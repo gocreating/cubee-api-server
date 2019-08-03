@@ -29,7 +29,7 @@ spec:
   #         serviceName: {{ .Values.project.name }}
   #         servicePort: 8000
 
-  - host: "*.cubee.cc"
+  - host: api.cubee.cc
     http:
       paths:
       - path: /

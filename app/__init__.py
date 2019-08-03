@@ -47,9 +47,15 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
-    @app.route('/config')
+    @app.route('/info')
     def config():
-        return jsonify(config_dict)
+        return jsonify(
+            repoName=os.environ['repoName'],
+            commitSHA1=os.environ['commitSHA1'],
+            buildNumber=os.environ['buildNumber'],
+            buildURL=os.environ['buildURL'],
+            buildDate=os.environ['buildDate'],
+        )
 
     @app.route('/')
     def index():

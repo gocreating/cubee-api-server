@@ -2,7 +2,10 @@
 # it is the only working version for installing `psycopg2`
 FROM alpine:3.7
 
-ARG COMMIT_REF
+ARG PROJECT_REPONAME
+ARG SHA1
+ARG BUILD_NUM
+ARG BUILD_URL
 ARG BUILD_DATE
 
 COPY requirements.txt /tmp/requirements.txt
@@ -17,8 +20,11 @@ COPY . /srv/cubee-api-server
 
 WORKDIR /srv/cubee-api-server
 
-ENV APP_COMMIT_REF=${COMMIT_REF} \
-    APP_BUILD_DATE=${BUILD_DATE}
+ENV repoName=${PROJECT_REPONAME} \
+    commitSHA1=${SHA1} \
+    buildNumber=${BUILD_NUM} \
+    buildURL=${BUILD_URL} \
+    buildDate=${BUILD_DATE}
 
 EXPOSE 8000
 

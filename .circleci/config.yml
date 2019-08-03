@@ -35,7 +35,6 @@ jobs:
       - GOOGLE_PROJECT_ID: "cubee-247317"
       - GOOGLE_COMPUTE_ZONE: "us-west1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-prod"
-      - DOCKER_REGISTRY_SERVER: "https://index.docker.io/v1/"
     steps:
       - checkout
       - attach_workspace:
@@ -66,24 +65,17 @@ jobs:
       - run:
           name: Deploy Docker Image
           command: |
-            TAG=release-$CIRCLE_SHA1
+            TAG=release-$CIRCLE_BUILD_NUM
             docker build \
-              --build-arg COMMIT_REF=${CIRCLE_SHA1} \
+              --build-arg PROJECT_REPONAME=${CIRCLE_PROJECT_REPONAME} \
+              --build-arg SHA1=${CIRCLE_SHA1} \
+              --build-arg BUILD_NUM=${CIRCLE_BUILD_NUM} \
+              --build-arg BUILD_URL=${CIRCLE_BUILD_URL} \
               --build-arg BUILD_DATE=`date -u +”%Y-%m-%dT%H:%M:%SZ”` \
               -t gocreating/cubee-api-server:$TAG \
               -f ./Dockerfile .
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push gocreating/cubee-api-server:$TAG
-      # - run:
-      #     name: Get the kubeconfig file
-      #     command: |
-      #       kubectl create secret docker-registry tmp-registry \
-      #         --docker-server=$DOCKER_REGISTRY_SERVER \
-      #         --docker-username=$DOCKER_USER \
-      #         --docker-password=$DOCKER_PASS
-      #       envsubst < ./helm-chart/${HELM_CHART_NAME}/values-prod.yaml > ./helm-chart/${HELM_CHART_NAME}/values.yaml
-      #       kubectl delete secret tmp-registry
-
       - run:
           name: Install Chart
           command: |
