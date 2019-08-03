@@ -12,7 +12,7 @@ def get_config():
     return config_dict
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True, subdomain_matching=True)
 
     ##################
     ## Setup config ##
@@ -59,5 +59,9 @@ def create_app(test_config=None):
     @app.route('/')
     def index():
         return 'Yo, this is cubee.cc'
+
+    @app.route('/sub', subdomain="<username>")
+    def username_test(username):
+        return 'Hi, {0}'.format(username)
 
     return app
