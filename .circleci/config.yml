@@ -1,9 +1,9 @@
 version: 2
 jobs:
-  decrypt_helm_values:
+  decrypt_secrets:
     docker:
       - image: gocreating/ansible-vault
-    working_directory: ~/fuck-circle-ci
+    working_directory: ~/my-working-directory
     environment:
     - PROJECT_NAME: "cubee-api-server"
     steps:
@@ -11,26 +11,27 @@ jobs:
       # https://support.circleci.com/hc/en-us/articles/360016505753-Resolve-Certificate-Signed-By-Unknown-Authority-error-in-Alpine-images
       - run: apk add ca-certificates
       - run:
-          name: Decrypt
+          name: Decrypt Secret Files
           command: |
-            mkdir -p ./my-workspace
+            mkdir -p ./my-persist-workspace
             echo $ANSIBLE_VAULT_PASSWORD > /root/ansible_vault.key
             ansible-vault decrypt \
               ./helm-chart/${PROJECT_NAME}/configMap-prod.yaml \
-              --output ./my-workspace/configMap-prod.yaml \
+              --output ./my-persist-workspace/configMap-prod.yaml \
               --vault-password-file=/root/ansible_vault.key
+            rm /root/ansible_vault.key
       - persist_to_workspace:
-          root: ./my-workspace
+          root: ./my-persist-workspace
           paths:
             - configMap-prod.yaml
-
 
   deploy_to_production:
     docker:
       - image: google/cloud-sdk
-    working_directory: ~/fuck-circle-ci
+    working_directory: ~/my-working-directory
     environment:
       - PROJECT_NAME: "cubee-api-server"
+      - HELM_CHART_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
       - GOOGLE_COMPUTE_ZONE: "us-west1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-prod"
@@ -38,32 +39,32 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ./my-workspace
+          at: ./my-persist-workspace
       - run:
-          name: Fuck1
+          name: Setup Decrypted Files
           command: |
-            pwd
-            cat ./my-workspace/configMap-prod.yaml
-      - run:
-          name: Fuck2
-          command: cp ./my-workspace/configMap-prod.yaml ./helm-chart/${PROJECT_NAME}/templates/configMap.yaml
-      - run:
-          name: Fuck3
-          command: ls ./helm-chart/${PROJECT_NAME}/templates -al
+            mv ./my-persist-workspace/configMap-prod.yaml ./helm-chart/${HELM_CHART_NAME}/templates/configMap.yaml
+            apt-get install -qq -y gettext
+            envsubst < ./helm-chart/${HELM_CHART_NAME}/values-prod.yaml > ./helm-chart/${HELM_CHART_NAME}/values.yaml
       - run:
           name: Setup Google Cloud SDK
           command: |
-            apt-get install -qq -y gettext
-            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
-            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            echo $GCLOUD_SERVICE_KEY > ./gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=./gcloud-service-key.json
             gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
             gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
             gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+            rm ./gcloud-service-key.json
+      - run:
+          name: Setup Helm
+          command: |
+            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+            kubectl apply -f rbac-config.yaml
+            helm init --service-account tiller --history-max 200
       - setup_remote_docker:
           docker_layer_caching: true
-
       - run:
-          name: Docker build and push
+          name: Deploy Docker Image
           command: |
             TAG=release-$CIRCLE_SHA1
             docker build \
@@ -74,58 +75,31 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push gocreating/cubee-api-server:$TAG
       # - run:
-      #     name: Deploy to Kubernetes
+      #     name: Get the kubeconfig file
       #     command: |
       #       kubectl create secret docker-registry tmp-registry \
       #         --docker-server=$DOCKER_REGISTRY_SERVER \
       #         --docker-username=$DOCKER_USER \
       #         --docker-password=$DOCKER_PASS
-      #       envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
-      #       kubectl apply -f ${HOME}/patched_k8s.yml
+      #       envsubst < ./helm-chart/${HELM_CHART_NAME}/values-prod.yaml > ./helm-chart/${HELM_CHART_NAME}/values.yaml
       #       kubectl delete secret tmp-registry
-      #       kubectl rollout status deployment/${PROJECT_NAME}
-      - run:
-          name: Get the kubeconfig file
-          command: |
-            kubectl create secret docker-registry tmp-registry \
-              --docker-server=$DOCKER_REGISTRY_SERVER \
-              --docker-username=$DOCKER_USER \
-              --docker-password=$DOCKER_PASS
-            envsubst < ./helm-chart/${PROJECT_NAME}/values-prod.yaml > ./helm-chart/${PROJECT_NAME}/values.yaml
-            kubectl delete secret tmp-registry
-      - run:
-          name: install helm
-          command: |
-            echo "install helm"
-
-            # installs helm with bash commands for easier command line integration
-            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
 
       - run:
-          name: initialize helm
+          name: Install Chart
           command: |
-            kubectl apply -f rbac-config.yaml
-            # kubectl delete deployment tiller-deploy --namespace=kube-system
-            # kubectl delete svc tiller-deploy --namespace=kube-system
-            helm init --service-account tiller --history-max 200
-
-      - run:
-          name: install chart
-          command: |
-            # Make sure we get the latest list of charts
             helm repo update
-            cd ./helm-chart/${PROJECT_NAME}
-            helm upgrade ${PROJECT_NAME} . -f values.yaml --install --force
+            cd ./helm-chart/${HELM_CHART_NAME}
+            helm upgrade ${HELM_CHART_NAME} . -f values.yaml --install --force
             helm ls
 
 workflows:
   version: 2
   build_image_and_deploy:
     jobs:
-      - decrypt_helm_values
+      - decrypt_secrets
       - deploy_to_production:
           requires:
-            - decrypt_helm_values
+            - decrypt_secrets
           filters:
             branches:
               only: master
