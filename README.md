@@ -91,10 +91,6 @@ $ kubectl scale --replicas=1 deployment/kube-dns --namespace=kube-system
 deployment.extensions/kube-dns scaled
 ```
 
-## TO-DO
-
-- SSL
-
 ## Launch in different environments
 
 ### (Recommended) dev/stg in container
