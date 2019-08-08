@@ -25,24 +25,6 @@ autoScaling:
 
 ingress:
   rules:
-    # can redirect cubee.cc, mutate with next rule
-    - host: stg.cubee.cc
-      http:
-        paths:
-        - path: /
-          backend:
-            serviceName: cubee-api-server
-            servicePort: 8000
-
-    # can redirect <any-sub-domain>.cubee.cc, mutate with previous rule
-    # - host: www.cubee.cc
-    #   http:
-    #     paths:
-    #     - path: /*
-    #       backend:
-    #         serviceName: cubee-api-server
-    #         servicePort: 8000
-
     - host: api.stg.cubee.cc
       http:
         paths:
