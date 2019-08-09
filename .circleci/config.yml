@@ -8,6 +8,9 @@ commands:
       helmValueFileName:
         type: string
         default: "values-stg.yaml"
+      configMapFileName:
+        type: string
+        default: "configMap-stg.yaml"
     steps:
       - checkout
       - attach_workspace:
@@ -20,7 +23,7 @@ commands:
       - run:
           name: Setup Decrypted Files
           command: |
-            mv ./my-persist-workspace/configMap-prod.yaml ./helm-chart/${HELM_CHART_NAME}/templates/configMap.yaml
+            mv ./my-persist-workspace/<< parameters.configMapFileName >> ./helm-chart/${HELM_CHART_NAME}/templates/configMap.yaml
             apt-get install -qq -y gettext
             envsubst < ./helm-chart/${HELM_CHART_NAME}/<< parameters.helmValueFileName >> > ./helm-chart/${HELM_CHART_NAME}/values.yaml
       - run:
@@ -128,6 +131,7 @@ jobs:
     steps:
       - deploy:
           helmValueFileName: "values-stg.yaml"
+          configMapFileName: "configMap-stg.yaml"
 
   deploy_to_production:
     docker:
@@ -142,6 +146,7 @@ jobs:
     steps:
       - deploy:
           helmValueFileName: "values-prod.yaml"
+          configMapFileName: "configMap-prod.yaml"
 
 workflows:
   version: 2
