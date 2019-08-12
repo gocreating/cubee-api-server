@@ -2,6 +2,7 @@ import os
 import yaml
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 is_prod = not 'CONFIG_PATH' in os.environ
 
@@ -13,6 +14,11 @@ def get_config():
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True, subdomain_matching=True)
+
+    ##################
+    ## Setup CORS ##
+    ##################
+    CORS(app)
 
     ##################
     ## Setup config ##
