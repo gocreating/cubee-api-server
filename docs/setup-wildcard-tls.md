@@ -9,7 +9,7 @@
 
 ``` bash
 $ sudo rm -rf certbot/*
-$ rm ./cert.pem ./privkey.pem
+$ rm ./fullchain.pem ./privkey.pem
 $ kubectl delete secret cubee-cc-tls
 ```
 
@@ -35,11 +35,11 @@ $ docker run -it --rm -v /home/gocreating/certbot:/etc/letsencrypt -v /home/gocr
     # --fullchain-path /etc/xxx.pem \
     # --chain-path /etc/xxx.pem \
     # --dry-run
-$ sudo cp certbot/live/cubee.cc/cert.pem .
+$ sudo cp certbot/live/cubee.cc/fullchain.pem .
 $ sudo cp certbot/live/cubee.cc/privkey.pem .
-$ sudo chmod 777 cert.pem
+$ sudo chmod 777 fullchain.pem
 $ sudo chmod 777 privkey.pem
-$ kubectl create secret tls cubee-cc-tls --cert cert.pem --key privkey.pem
+$ kubectl create secret tls cubee-cc-tls --cert fullchain.pem --key privkey.pem
 secret/cubee-cc-tls created
 ```
 
@@ -73,10 +73,10 @@ Congratulations, all renewals succeeded. The following certs have been renewed:
 更新k8s設定
 
 ``` bash
-$ sudo cp certbot/live/cubee.cc/cert.pem .
+$ sudo cp certbot/live/cubee.cc/fullchain.pem .
 $ sudo cp certbot/live/cubee.cc/privkey.pem .
-$ sudo chmod 777 cert.pem
+$ sudo chmod 777 fullchain.pem
 $ sudo chmod 777 privkey.pem
 $ kubectl delete secret cubee-cc-tls
-$ kubectl create secret tls cubee-cc-tls --cert cert.pem --key privkey.pem
+$ kubectl create secret tls cubee-cc-tls --cert fullchain.pem --key privkey.pem
 ```
