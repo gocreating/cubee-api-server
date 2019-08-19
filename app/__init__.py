@@ -1,7 +1,9 @@
 import os
 import yaml
 
+from datetime import timedelta
 from flask import Flask, jsonify
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from flask_cors import CORS
 
 is_prod = not 'CONFIG_PATH' in os.environ
@@ -15,9 +17,14 @@ def get_config():
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True, subdomain_matching=True)
 
-    ##################
+    ###############
+    ## Setup JWT ##
+    ###############
+    jwt = JWTManager(app)
+
+    ################
     ## Setup CORS ##
-    ##################
+    ################
     CORS(app)
 
     ##################
@@ -28,6 +35,8 @@ def create_app(test_config=None):
         SECRET_KEY=None if is_prod else 'dev',
         SERVER_NAME=None if is_prod else config_dict['SERVER_NAME'],
         SQLALCHEMY_DATABASE_URI=config_dict['SQLALCHEMY_DATABASE_URI'],
+        JWT_SECRET_KEY=config_dict['JWT_SECRET_KEY'],
+        JWT_ACCESS_TOKEN_EXPIRES=timedelta(days=1),
     )
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)
@@ -69,5 +78,11 @@ def create_app(test_config=None):
     @app.route('/sub', subdomain="<username>")
     def username_test(username):
         return 'Hi, {0}'.format(username)
+
+    @app.route('/protected', methods=['GET'])
+    @jwt_required
+    def protected():
+        user = get_jwt_identity()
+        return jsonify(loggedInUser=user)
 
     return app
