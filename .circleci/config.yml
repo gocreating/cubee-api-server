@@ -38,16 +38,15 @@ commands:
       - run:
           name: Setup Helm
           command: |
-            curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
-            kubectl apply -f rbac-config.yaml
-            helm init --service-account tiller --history-max 200
+            curl https://raw.githubusercontent.com/helm/helm/v2.14.3/scripts/get | bash
+            helm init --client-only --history-max 10
       - run:
           name: Install Chart
           command: |
             helm repo update
             cd ./helm-chart/${HELM_CHART_NAME}
             cat values.yaml
-            helm upgrade ${HELM_CHART_NAME} . -f values.yaml --install --force
+            helm upgrade ${HELM_CHART_NAME} . -f values.yaml --install --recreate-pods --force --reset-values
             helm ls
 
 jobs:
@@ -126,7 +125,7 @@ jobs:
       - PROJECT_NAME: "cubee-api-server"
       - HELM_CHART_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
-      - GOOGLE_COMPUTE_ZONE: "us-west1-a"
+      - GOOGLE_COMPUTE_ZONE: "asia-east1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-stg"
     steps:
       - deploy:
