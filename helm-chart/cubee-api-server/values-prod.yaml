@@ -11,9 +11,9 @@ pod:
     cluster: "cubee-prod"
 
 healthz:
-  path: /
-  initialDelay: 15
-  period: 15
+  path: /info
+  initialDelay: 300
+  period: 600
   timeout: 10
   success: 1
   failure: 3

@@ -31,19 +31,19 @@ spec:
         - name: http
           containerPort: 8000
           protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.healthz.path | default "/" }}
-              port: http
-            initialDelaySeconds: {{ .Values.healthz.initialDelay | default 10 }}
-            periodSeconds: {{ .Values.healthz.period | default 15 }}
-            timeoutSeconds: {{ .Values.healthz.timeout | default 5 }}
-            successThreshold: {{ .Values.healthz.success | default 1 }}
-            failureThreshold: {{ .Values.healthz.failure | default 3 }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.healthz.path | default "/" }}
-              port: http
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.healthz.path | default "/" }}
+            port: http
+          initialDelaySeconds: {{ .Values.healthz.initialDelay | default 10 }}
+          periodSeconds: {{ .Values.healthz.period | default 15 }}
+          timeoutSeconds: {{ .Values.healthz.timeout | default 5 }}
+          successThreshold: {{ .Values.healthz.success | default 1 }}
+          failureThreshold: {{ .Values.healthz.failure | default 3 }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.healthz.path | default "/" }}
+            port: http
         volumeMounts:
         - name: config-volume
           mountPath: /etc/config.yaml
