@@ -25,7 +25,7 @@ commands:
           command: |
             mv ./my-persist-workspace/<< parameters.configMapFileName >> ./helm-chart/${HELM_CHART_NAME}/templates/configMap.yaml
             apt-get install -qq -y gettext
-            envsubst < ./helm-chart/${HELM_CHART_NAME}/<< parameters.helmValueFileName >> > ./helm-chart/${HELM_CHART_NAME}/values.yaml
+            envsubst < ./helm-chart/${HELM_CHART_NAME}/<< parameters.helmValueFileName >> >> ./helm-chart/${HELM_CHART_NAME}/values.yaml
       - run:
           name: Setup Google Cloud SDK
           command: |
@@ -55,8 +55,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - run:
           name: Setup Environment Variable
           command: |
@@ -140,7 +139,7 @@ jobs:
       - PROJECT_NAME: "cubee-api-server"
       - HELM_CHART_NAME: "cubee-api-server"
       - GOOGLE_PROJECT_ID: "cubee-247317"
-      - GOOGLE_COMPUTE_ZONE: "us-west1-a"
+      - GOOGLE_COMPUTE_ZONE: "asia-east1-a"
       - GOOGLE_CLUSTER_NAME: "cubee-prod"
     steps:
       - deploy:
