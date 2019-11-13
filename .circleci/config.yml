@@ -50,6 +50,18 @@ commands:
             helm ls
 
 jobs:
+  commit_tests:
+    build_docker_image:
+    machine:
+      image: circleci/classic:201808-01
+    working_directory: ~/my-working-directory
+    steps:
+      - checkout
+      - run:
+          name: Execute Test Runner
+          command: |
+            docker-compose --file docker-compose-run-tests.yaml up --exit-code-from api-server-test-runner
+
   build_docker_image:
     docker:
       - image: google/cloud-sdk
@@ -150,6 +162,7 @@ workflows:
   version: 2
   build_image_and_deploy:
     jobs:
+      - commit_tests
       - build_docker_image:
           filters:
             branches:
@@ -157,6 +170,8 @@ workflows:
             tags:
               only: /release-.*/
       - decrypt_secrets:
+          requires:
+            - commit_tests
           filters:
             branches:
               only: master
