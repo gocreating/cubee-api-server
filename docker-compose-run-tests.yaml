@@ -1,0 +1,28 @@
+version: '3'
+services:
+  api-server-test-runner:
+    build: .
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      # external port: internal port
+      - "8000:5000"
+    volumes:
+      - .:/srv/cubee-api-server
+      - ./config-test.yaml:/etc/config.yaml
+    environment:
+      - FLASK_APP=app
+      - FLASK_ENV=test
+    entrypoint: pytest
+    command: "--cov=app ./tests/"
+  db:
+    image: postgres:11
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=api_server_test
+    ports:
+      - "5432:5432"
