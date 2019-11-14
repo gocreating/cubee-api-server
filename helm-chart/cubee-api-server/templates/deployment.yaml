@@ -9,6 +9,11 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.project.name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1         # how many pods we can add at a time
+      maxUnavailable: 25%
   template:
     metadata:
       labels:
@@ -22,11 +27,6 @@ spec:
         # resources:
         #   requests:
         #     memory: "80Mi"
-        strategy:
-          type: RollingUpdate
-          rollingUpdate:
-            maxSurge: 1         # how many pods we can add at a time
-            maxUnavailable: 0   # maxUnavailable define how many pods can be unavailable during the rolling update
         ports:
         - name: http
           containerPort: 8000
