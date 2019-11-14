@@ -51,7 +51,6 @@ commands:
 
 jobs:
   commit_tests:
-    build_docker_image:
     machine:
       image: circleci/classic:201808-01
     working_directory: ~/my-working-directory
