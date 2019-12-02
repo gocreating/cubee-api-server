@@ -163,7 +163,10 @@ workflows:
   version: 2
   build_image_and_deploy:
     jobs:
-      - commit_tests
+      - commit_tests:
+          filters:
+            tags:
+              only: /.*/
       - build_docker_image:
           filters:
             branches:
