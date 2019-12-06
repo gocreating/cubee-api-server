@@ -1,34 +1,18 @@
-import datetime
-
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+import sqlalchemy as sa
 from sqlalchemy.sql import func
-from app.db import Base
 
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    username = Column(String(30), unique=True)
-    password = Column(String(120), unique=True)
+metadata = sa.MetaData()
 
-    def __init__(self, username=None, password=None):
-        self.username = username
-        self.password = password
+users = sa.Table('users', metadata,
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('username', sa.String(50), unique=True),
+    sa.Column('password', sa.String(120), unique=True),
+)
 
-    def __repr__(self):
-        return '<User %r>' % (self.username)
-
-class Post(Base):
-    __tablename__ = 'posts'
-    id = Column(Integer, primary_key=True)
-    author_id = Column(Integer, ForeignKey('users.id'))
-    created = Column(DateTime, default=func.now())
-    title = Column(String(30))
-    body = Column(String(120))
-
-    def __init__(self, author_id=None, title=None, body=None):
-        self.author_id = author_id
-        self.title = title
-        self.body = body
-
-    def __repr__(self):
-        return '<Post %r>' % (self.title)
+posts = sa.Table('posts', metadata,
+    sa.Column('id', sa.Integer, primary_key=True),
+    sa.Column('author_id', None, sa.ForeignKey('users.id')),
+    sa.Column('created', sa.DateTime, default=func.now()),
+    sa.Column('title', sa.String(100)),
+    sa.Column('body', sa.String),
+)

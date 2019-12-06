@@ -6,6 +6,8 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 from flask_cors import CORS
 
+from app import db
+
 is_prod = not 'CONFIG_PATH' in os.environ
 
 def get_config():
@@ -48,8 +50,8 @@ def create_app(test_config=None):
     ####################
     ## Setup database ##
     ####################
-    from . import db
-    db.init_app(app)
+    db_engine = db.init_app(app)
+    app.db_engine = db_engine
     app.logger.info('Database connected.')
 
     ###################
