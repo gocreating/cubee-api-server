@@ -1,6 +1,7 @@
 import unittest
 
-from app import create_app, db
+from app import db
+from app.main import create_app
 
 class TestBasicApp(unittest.TestCase):
     def setUp(self):

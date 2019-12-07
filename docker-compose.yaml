@@ -9,7 +9,7 @@ services:
       - .:/srv/cubee-api-server
       - ./config-stg.yaml:/etc/config.yaml
     environment:
-      - FLASK_APP=app
+      - FLASK_APP=app.main
       - FLASK_ENV=development
     entrypoint: flask
     command: "run --host=0.0.0.0"

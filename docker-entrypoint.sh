@@ -3,6 +3,6 @@ set -e
 
 case "$@" in
 *)
-    exec gunicorn --config gunicorn_config.py "app:create_app()"
+    exec gunicorn --config gunicorn_config.py "app.main:create_app()"
     ;;
 esac
