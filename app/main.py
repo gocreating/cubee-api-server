@@ -29,7 +29,7 @@ def create_app(test_config=None):
     ################
     ## Setup CORS ##
     ################
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
     ##################
     ## Setup config ##
