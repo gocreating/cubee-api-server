@@ -2,7 +2,7 @@ import functools
 
 from sqlalchemy.sql import select
 from flask import Blueprint, current_app, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, set_access_cookies
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models import users
@@ -97,10 +97,12 @@ def login():
                 'username': row[users.c.username],
             }
             access_token = create_access_token(identity=identity)
-            return jsonify(code=200, data={
+            resp = jsonify(code=200, data={
                 'user': identity,
                 'access_token': access_token,
             })
+            set_access_cookies(resp, access_token)
+            return resp
 
     except Exception as e:
         current_app.logger.error(e)
