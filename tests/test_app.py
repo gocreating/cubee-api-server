@@ -67,11 +67,16 @@ class TestApp(TestBasicApp):
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res_json['code'], 200)
             self.assertTrue(res_json['data']['access_token'])
+            self.assertTrue(res_json['data']['csrf_token'])
             self.assertTrue(res_json['data']['user'])
             tokenCookieList = [cookie for cookie in client.cookie_jar if cookie.name == 'access_token_cookie']
+            csrfTokenCookieList = [cookie for cookie in client.cookie_jar if cookie.name == 'csrf_access_token']
             self.assertEqual(len(tokenCookieList), 1)
+            self.assertEqual(len(csrfTokenCookieList), 1)
             tokenCookie = tokenCookieList[0]
+            csrfTokenCookie = csrfTokenCookieList[0]
             self.assertEqual(tokenCookie.value, res_json['data']['access_token'])
+            self.assertEqual(csrfTokenCookie.value, res_json['data']['csrf_token'])
 
     def test_fail_to_login_exist_user(self):
         with self.flask_app.test_client() as client:

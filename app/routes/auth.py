@@ -6,6 +6,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
     create_access_token,
+    get_csrf_token,
     set_access_cookies,
     unset_jwt_cookies
 )
@@ -103,9 +104,11 @@ def login():
                 'username': row[users.c.username],
             }
             access_token = create_access_token(identity=identity)
+            csrf_token = get_csrf_token(access_token)
             resp = jsonify(code=200, data={
                 'user': identity,
                 'access_token': access_token,
+                'csrf_token': csrf_token,
             })
             set_access_cookies(resp, access_token)
             return resp
