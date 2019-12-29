@@ -2,7 +2,13 @@ import functools
 
 from sqlalchemy.sql import select
 from flask import Blueprint, current_app, request, jsonify
-from flask_jwt_extended import create_access_token, set_access_cookies
+from flask_jwt_extended import (
+    jwt_required,
+    get_jwt_identity,
+    create_access_token,
+    set_access_cookies,
+    unset_jwt_cookies
+)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models import users
@@ -111,3 +117,13 @@ def login():
     return jsonify(code=200, data={
         'access_token': access_token,
     })
+
+@bp.route('/logout', methods=['POST'])
+@jwt_required
+def logout():
+    user = get_jwt_identity()
+    resp = jsonify(code=200, data={
+        'user': user,
+    })
+    unset_jwt_cookies(resp)
+    return resp
