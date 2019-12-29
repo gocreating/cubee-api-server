@@ -42,6 +42,7 @@ def create_app(test_config=None):
         JWT_SECRET_KEY=config_dict['JWT_SECRET_KEY'],
         JWT_ACCESS_TOKEN_EXPIRES=timedelta(days=1),
         JWT_TOKEN_LOCATION=['headers', 'cookies', 'query_string', 'json'],
+        JWT_COOKIE_DOMAIN=config_dict['JWT_COOKIE_DOMAIN'],
     )
     if test_config is None:
         app.config.from_pyfile('config.py', silent=True)

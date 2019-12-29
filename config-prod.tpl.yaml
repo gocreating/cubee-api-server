@@ -1,3 +1,4 @@
 SERVER_NAME: example.com
 SQLALCHEMY_DATABASE_URI: postgresql://user:pass@host:port/db
 JWT_SECRET_KEY: my-jwt-secret-key
+JWT_COOKIE_DOMAIN: .example.com
