@@ -39,11 +39,22 @@ $ docker build -t gocreating/ansible-vault -f ansible-vault-dockerfile .
 
 2. Encrypt/Decrypt
 
+Helm Chart Values:
+
 ``` bash
 $ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault encrypt ./configMap-prod.yaml
 $ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault encrypt ./configMap-stg.yaml
 $ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault decrypt ./configMap-prod.yaml
 $ docker run -it --rm -v c:/projects/cubee/cubee-api-server/helm-chart/cubee-api-server:/ansible gocreating/ansible-vault decrypt ./configMap-stg.yaml
+```
+
+Alembic Configuration:
+
+``` bash
+$ docker run -it --rm -v /c/projects/cubee/cubee-api-server:/ansible gocreating/ansible-vault encrypt ./alembic-stg.ini
+$ docker run -it --rm -v /c/projects/cubee/cubee-api-server:/ansible gocreating/ansible-vault encrypt ./alembic-prod.ini
+$ docker run -it --rm -v /c/projects/cubee/cubee-api-server:/ansible gocreating/ansible-vault decrypt ./alembic-stg.ini
+$ docker run -it --rm -v /c/projects/cubee/cubee-api-server:/ansible gocreating/ansible-vault decrypt ./alembic-prod.ini
 ```
 
 ## Touble Shooting
