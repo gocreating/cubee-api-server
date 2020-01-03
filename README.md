@@ -1,5 +1,7 @@
 # Cubee API Server
 
+[![CircleCI](https://circleci.com/gh/gocreating/cubee-api-server/tree/master.svg?style=svg)](https://circleci.com/gh/gocreating/cubee-api-server/tree/master)
+
 ## Launch in different environments
 
 ### (Recommended) dev/stg in container
