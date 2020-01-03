@@ -14,5 +14,5 @@ posts = sa.Table('posts', metadata,
     sa.Column('author_id', None, sa.ForeignKey('users.id')),
     sa.Column('created', sa.DateTime, default=func.now()),
     sa.Column('title', sa.String(100)),
-    sa.Column('body', sa.String),
+    sa.Column('body', sa.JSON),
 )
