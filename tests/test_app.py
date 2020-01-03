@@ -153,7 +153,6 @@ class TestApp(TestBasicApp):
             self.assertEqual(res.status_code, 200)
             self.assertEqual(res_json['code'], 200)
             self.assertEqual(res_json['data']['user']['username'], EXIST_USERNAME)
-            tokenCookieList = [cookie for cookie in client.cookie_jar if cookie.name == 'access_token_cookie']
             self.assertEqual(len(res.headers.getlist('Set-Cookie')), 4) # access_token_cookie, csrf_access_token, refresh_token_cookie, csrf_refresh_token
 
     def test_fail_to_logout_without_access_token(self):
