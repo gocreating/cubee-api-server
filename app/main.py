@@ -7,7 +7,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
 from app import db
-from app.routes import main, auth, user
+from app.routes import main, auth, user, post
 
 is_prod = not 'CONFIG_PATH' in os.environ
 
@@ -65,5 +65,6 @@ def create_app(test_config=None):
     auth.init_app(app)
     app.register_blueprint(auth.bp)
     app.register_blueprint(user.bp)
+    app.register_blueprint(post.bp)
 
     return app
