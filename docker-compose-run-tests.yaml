@@ -16,7 +16,7 @@ services:
       - FLASK_APP=app
       - FLASK_ENV=test
     entrypoint: pytest
-    command: "--cov=app ./tests/"
+    command: "--cov=app --color=yes -rA ./tests/"
   db:
     image: postgres:11
     restart: always
