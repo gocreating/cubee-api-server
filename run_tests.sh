@@ -5,4 +5,4 @@ if [ -n "$REBUILD" ]; then
     docker-compose --file docker-compose-run-tests.yaml build
 fi
 
-docker-compose --file docker-compose-run-tests.yaml up --exit-code-from api-server-test-runner
+docker-compose --file docker-compose-run-tests.yaml up --exit-code-from api-server-test-runner --remove-orphans
