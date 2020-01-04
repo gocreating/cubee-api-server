@@ -64,6 +64,19 @@ class TestRoutePost(TestBasicApp):
             self.assertEqual(res_json['data']['post']['title'], post_title)
             self.assertEqual(res_json['data']['post']['body'], post_body)
 
+    def test_fail_to_create_post_without_required_fields(self):
+        with self.flask_app.test_client() as client:
+            post_body = { 'key1': 'value1' }
+            res = client.post(
+                '/posts/',
+                headers={ 'Authorization': 'Bearer {}'.format(self.getAccessToken()) },
+                json={ 'body': post_body },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 400)
+            self.assertEqual(res_json['code'], 400)
+            self.assertTrue(res_json['data']['message'])
+
     def test_success_to_read_existing_post(self):
         post_title = 'POST TITLE'
         post_body = {
