@@ -3,6 +3,7 @@ from flask import Blueprint, current_app, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.models import posts
+from app.utils import datetime
 
 bp = Blueprint('post', __name__, url_prefix='/posts')
 
@@ -20,14 +21,24 @@ def create_post():
 
         user = get_jwt_identity()
         conn = current_app.db_engine.connect()
-        result = conn.execute(posts.insert().returning(posts.c.id, posts.c.title, posts.c.body),
-            author_id=user['id'], title=title, body=body)
+        result = conn.execute(
+            posts.insert().returning(
+                posts.c.id,
+                posts.c.title,
+                posts.c.body,
+                posts.c.created_ts,
+                posts.c.updated_ts,
+            ),
+            author_id=user['id'], title=title, body=body
+        )
         post = result.fetchone()
         return jsonify(code=200, data={
             'post': {
                 'id': post[posts.c.id],
                 'title': post[posts.c.title],
                 'body': post[posts.c.body],
+                'created_ts': datetime.to_seconds(post[posts.c.created_ts]),
+                'updated_ts': datetime.to_seconds(post[posts.c.updated_ts]),
             },
         })
 
@@ -42,6 +53,8 @@ def read_post(id):
         posts.c.id,
         posts.c.title,
         posts.c.body,
+        posts.c.created_ts,
+        posts.c.updated_ts,
     ]).where(posts.c.id == id)
     result = conn.execute(query)
     post = result.fetchone()
@@ -55,6 +68,8 @@ def read_post(id):
                 'id': post[posts.c.id],
                 'title': post[posts.c.title],
                 'body': post[posts.c.body],
+                'created_ts': datetime.to_seconds(post[posts.c.created_ts]),
+                'updated_ts': datetime.to_seconds(post[posts.c.updated_ts]),
             },
         })
 
@@ -77,7 +92,13 @@ def update_post(id):
             .values(title=title, body=body)\
             .where(posts.c.author_id == user['id'])\
             .where(posts.c.id == id)\
-            .returning(posts.c.id, posts.c.title, posts.c.body)
+            .returning(
+                posts.c.id,
+                posts.c.title,
+                posts.c.body,
+                posts.c.created_ts,
+                posts.c.updated_ts,
+            )
         result = conn.execute(query)
         post = result.fetchone()
 
@@ -89,6 +110,8 @@ def update_post(id):
                 'id': post[posts.c.id],
                 'title': post[posts.c.title],
                 'body': post[posts.c.body],
+                'created_ts': datetime.to_seconds(post[posts.c.created_ts]),
+                'updated_ts': datetime.to_seconds(post[posts.c.updated_ts]),
             },
         })
 
