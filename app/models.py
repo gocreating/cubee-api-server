@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from sqlalchemy.sql import func
+import datetime
 
 metadata = sa.MetaData()
 
@@ -12,7 +12,8 @@ users = sa.Table('users', metadata,
 posts = sa.Table('posts', metadata,
     sa.Column('id', sa.Integer, primary_key=True),
     sa.Column('author_id', None, sa.ForeignKey('users.id')),
-    sa.Column('created', sa.DateTime, default=func.now()),
+    sa.Column('created_ts', sa.TIMESTAMP, default=datetime.datetime.utcnow),
+    sa.Column('updated_ts', sa.TIMESTAMP, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow),
     sa.Column('title', sa.String(100)),
     sa.Column('body', sa.JSON),
 )
