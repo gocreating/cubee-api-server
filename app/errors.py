@@ -24,6 +24,12 @@ class BadRequest(GenericError):
             message = 'Bad request'
         GenericError.__init__(self, message=message, payload=payload, code=400)
 
+class Unauthorized(GenericError):
+    def __init__(self, message=None, payload=None):
+        if message is None:
+            message = 'Unauthorized'
+        GenericError.__init__(self, message=message, payload=payload, code=401)
+
 class Forbidden(GenericError):
     def __init__(self, message=None, payload=None):
         if message is None:
@@ -35,3 +41,9 @@ class NotFound(GenericError):
         if message is None:
             message = 'Not found'
         GenericError.__init__(self, message=message, payload=payload, code=404)
+
+class UnprocessableEntity(GenericError):
+    def __init__(self, message=None, payload=None):
+        if message is None:
+            message = 'Unprocessable entity'
+        GenericError.__init__(self, message=message, payload=payload, code=422)
