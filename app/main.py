@@ -61,6 +61,7 @@ def create_app(test_config=None):
     ###################
     ## Setup routing ##
     ###################
+    main.init_app(app)
     app.register_blueprint(main.bp)
     auth.init_app(app)
     app.register_blueprint(auth.bp)
