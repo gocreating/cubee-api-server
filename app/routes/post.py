@@ -52,9 +52,9 @@ def read_post(id):
 
     return jsonify(code=200, data={
             'post': {
-                'id': post['id'],
-                'title': post['title'],
-                'body': post['body'],
+                'id': post[posts.c.id],
+                'title': post[posts.c.title],
+                'body': post[posts.c.body],
             },
         })
 
