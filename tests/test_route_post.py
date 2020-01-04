@@ -186,3 +186,56 @@ class TestRoutePost(TestBasicApp):
             self.assertEqual(res.status_code, 403)
             self.assertEqual(res_json['code'], 403)
             self.assertTrue(res_json['data']['message'])
+
+    def test_success_to_delete_existing_post_as_author(self):
+        post_title = 'POST TITLE'
+        post_body = {
+            'key1': 'value1',
+            'key2': 'value2',
+        }
+        existing_post = self.createPost(self.user_id, post_title, post_body)
+        with self.flask_app.test_client() as client:
+            res = client.delete(
+                '/posts/{}'.format(existing_post.id),
+                headers={ 'Authorization': 'Bearer {}'.format(self.getAccessToken()) },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res_json['code'], 200)
+            self.assertEqual(res_json['data']['post']['id'], existing_post.id)
+            self.assertEqual(res_json['data']['post']['title'], post_title)
+            self.assertEqual(res_json['data']['post']['body'], post_body)
+
+    def test_fail_to_delete_existing_post_as_guest(self):
+        post_title = 'POST TITLE'
+        post_body = {
+            'key1': 'value1',
+            'key2': 'value2',
+        }
+        existing_post = self.createPost(self.user_id, post_title, post_body)
+        with self.flask_app.test_client() as client:
+            guest_identity = {
+                'id': 123,
+                'username': 'guest',
+            }
+            with self.flask_app.app_context():
+                guest_access_token = create_access_token(identity=guest_identity)
+            res = client.delete(
+                '/posts/{}'.format(existing_post.id),
+                headers={ 'Authorization': 'Bearer {}'.format(guest_access_token) },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 403)
+            self.assertEqual(res_json['code'], 403)
+            self.assertTrue(res_json['data']['message'])
+
+    def test_fail_to_delete_non_existing_post(self):
+        with self.flask_app.test_client() as client:
+            res = client.delete(
+                '/posts/123',
+                headers={ 'Authorization': 'Bearer {}'.format(self.getAccessToken()) },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 403)
+            self.assertEqual(res_json['code'], 403)
+            self.assertTrue(res_json['data']['message'])

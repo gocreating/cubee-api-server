@@ -95,3 +95,32 @@ def update_post(id):
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=500, data=e), 500
+
+@bp.route('/<id>', methods=['DELETE'])
+@jwt_required
+def delete_post(id):
+    try:
+        user = get_jwt_identity()
+        conn = current_app.db_engine.connect()
+        query = posts\
+            .delete()\
+            .where(posts.c.author_id == user['id'])\
+            .where(posts.c.id == id)\
+            .returning(posts.c.id, posts.c.title, posts.c.body)
+        result = conn.execute(query)
+        post = result.fetchone()
+
+        if not post:
+            return jsonify(code=403, data={ 'message': 'You are not allowed to access this post.' }), 403
+
+        return jsonify(code=200, data={
+            'post': {
+                'id': post[posts.c.id],
+                'title': post[posts.c.title],
+                'body': post[posts.c.body],
+            },
+        })
+
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(code=500, data=e), 500
