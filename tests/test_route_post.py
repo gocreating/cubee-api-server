@@ -100,3 +100,89 @@ class TestRoutePost(TestBasicApp):
             self.assertEqual(res.status_code, 404)
             self.assertEqual(res_json['code'], 404)
             self.assertTrue(res_json['data']['message'])
+
+    def test_success_to_update_existing_post_as_author(self):
+        post_title = 'ORIGINAL POST TITLE'
+        post_body = {
+            'key1': 'value1',
+            'key2': 'value2',
+        }
+        origin_post = self.createPost(self.user_id, post_title, post_body)
+        with self.flask_app.test_client() as client:
+            new_post_title = 'NEW POST TITLE'
+            new_post_body = {
+                'key3': 'value3',
+                'key4': 'value4',
+            }
+            res = client.put(
+                '/posts/{}'.format(origin_post.id),
+                headers={ 'Authorization': 'Bearer {}'.format(self.getAccessToken()) },
+                json={
+                    'title': new_post_title,
+                    'body': new_post_body,
+                },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res_json['code'], 200)
+            self.assertEqual(res_json['data']['post']['id'], origin_post.id)
+            self.assertEqual(res_json['data']['post']['title'], new_post_title)
+            self.assertEqual(res_json['data']['post']['body'], new_post_body)
+
+    def test_fail_to_update_existing_post_as_guest(self):
+        post_title = 'ORIGINAL POST TITLE'
+        post_body = {
+            'key1': 'value1',
+            'key2': 'value2',
+        }
+        origin_post = self.createPost(self.user_id, post_title, post_body)
+        with self.flask_app.test_client() as client:
+            new_post_title = 'NEW POST TITLE'
+            new_post_body = {
+                'key3': 'value3',
+                'key4': 'value4',
+            }
+            guest_identity = {
+                'id': 123,
+                'username': 'guest',
+            }
+            with self.flask_app.app_context():
+                guest_access_token = create_access_token(identity=guest_identity)
+            res = client.put(
+                '/posts/{}'.format(origin_post.id),
+                headers={ 'Authorization': 'Bearer {}'.format(guest_access_token) },
+                json={
+                    'title': new_post_title,
+                    'body': new_post_body,
+                },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 403)
+            self.assertEqual(res_json['code'], 403)
+            self.assertTrue(res_json['data']['message'])
+
+    def test_fail_to_update_non_existing_post(self):
+        post_title = 'ORIGINAL POST TITLE'
+        post_body = {
+            'key1': 'value1',
+            'key2': 'value2',
+        }
+        origin_post = self.createPost(self.user_id, post_title, post_body)
+        with self.flask_app.test_client() as client:
+            new_post_title = 'NEW POST TITLE'
+            new_post_body = {
+                'key3': 'value3',
+                'key4': 'value4',
+            }
+            res = client.put(
+                '/posts/123',
+                headers={ 'Authorization': 'Bearer {}'.format(self.getAccessToken()) },
+                json={
+                    'title': new_post_title,
+                    'body': new_post_body,
+                },
+            )
+            res_json = res.get_json()
+            self.assertEqual(res.status_code, 403)
+            self.assertEqual(res_json['code'], 403)
+            self.assertTrue(res_json['data']['message'])
