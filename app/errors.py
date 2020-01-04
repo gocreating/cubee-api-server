@@ -17,3 +17,21 @@ class GenericError(Exception):
         return jsonify(code=self.code, data={
             'message': self.message,
         }), self.code
+
+class BadRequest(GenericError):
+    def __init__(self, message=None, payload=None):
+        if message is None:
+            message = 'Bad request'
+        GenericError.__init__(self, message=message, payload=payload, code=400)
+
+class Forbidden(GenericError):
+    def __init__(self, message=None, payload=None):
+        if message is None:
+            message = 'Forbidden'
+        GenericError.__init__(self, message=message, payload=payload, code=403)
+
+class NotFound(GenericError):
+    def __init__(self, message=None, payload=None):
+        if message is None:
+            message = 'Not found'
+        GenericError.__init__(self, message=message, payload=payload, code=404)
