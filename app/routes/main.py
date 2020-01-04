@@ -14,7 +14,7 @@ def index():
     )
 
 @bp.route('/info')
-def config():
+def info():
     return jsonify(
         code=200,
         data={
