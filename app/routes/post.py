@@ -1,3 +1,4 @@
+from sqlalchemy.sql import select
 from flask import Blueprint, current_app, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -33,3 +34,26 @@ def create_post():
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=500, data=e), 500
+
+@bp.route('/<id>', methods=['GET'])
+def read_post(id):
+    conn = current_app.db_engine.connect()
+    query = select([
+        posts.c.id,
+        posts.c.title,
+        posts.c.body,
+    ]).where(posts.c.id == id)
+    result = conn.execute(query)
+    post = result.fetchone()
+    result.close()
+
+    if not post:
+        return jsonify(code=404, data={ 'message': 'Post not found.' }), 404
+
+    return jsonify(code=200, data={
+            'post': {
+                'id': post['id'],
+                'title': post['title'],
+                'body': post['body'],
+            },
+        })
