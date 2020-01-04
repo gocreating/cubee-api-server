@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash
 from flask_jwt_extended import create_access_token
 
 from app.models import metadata, users, posts
+from app.utils import datetime
 
 EXIST_USERNAME = 'postAuthor'
 EXIST_PASSWORD = 'postAuthorPassword'
@@ -30,9 +31,65 @@ class TestRoutePost(TestBasicApp):
         post = result.fetchone()
         return post
 
+    def createUsersAndPosts(self):
+        raw_users = self.conn.execute(
+            users.insert().values([
+                { 'username': 'u1', 'password': 'pass'},
+                { 'username': 'u2', 'password': 'pass'},
+            ]).returning(users.c.id, users.c.username),
+        ).fetchall()
+        raw_posts = self.conn.execute(
+            posts.insert().values([
+                { 'author_id': raw_users[0][users.c.id], 'title': 't1', 'body': { 'key': 'value' }},
+                { 'author_id': raw_users[0][users.c.id], 'title': 't2', 'body': { 'key': 'value' }},
+                { 'author_id': raw_users[1][users.c.id], 'title': 't3', 'body': { 'key': 'value' }},
+                { 'author_id': raw_users[1][users.c.id], 'title': 't4', 'body': { 'key': 'value' }},
+            ]).returning(posts.c.id, posts.c.title, posts.c.body, posts.c.created_ts, posts.c.updated_ts),
+        ).fetchall()
+        return raw_users, raw_posts
+
     def tearDown(self):
         super().tearDown()
         metadata.drop_all(self.flask_app.db_engine)
+
+    def test_success_to_list_post(self):
+        raw_users, raw_posts = self.createUsersAndPosts()
+        with self.flask_app.test_client() as client:
+            res = client.get('/posts/')
+            res_json = res.get_json()
+
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res_json['code'], 200)
+            self.assertEqual(res_json['data']['posts'], [
+                {
+                    'id': raw_posts[0].id,
+                    'title': raw_posts[0].title,
+                    'created_ts': datetime.to_seconds(raw_posts[0].created_ts),
+                    'updated_ts': datetime.to_seconds(raw_posts[0].updated_ts),
+                    'author': { 'id': raw_users[0].id, 'username': raw_users[0].username },
+                },
+                {
+                    'id': raw_posts[1].id,
+                    'title': raw_posts[1].title,
+                    'created_ts': datetime.to_seconds(raw_posts[1].created_ts),
+                    'updated_ts': datetime.to_seconds(raw_posts[1].updated_ts),
+                    'author': { 'id': raw_users[0].id, 'username': raw_users[0].username },
+                },
+                {
+                    'id': raw_posts[2].id,
+                    'title': raw_posts[2].title,
+                    'created_ts': datetime.to_seconds(raw_posts[2].created_ts),
+                    'updated_ts': datetime.to_seconds(raw_posts[2].updated_ts),
+                    'author': { 'id': raw_users[1].id, 'username': raw_users[1].username },
+                },
+                {
+                    'id': raw_posts[3].id,
+                    'title': raw_posts[3].title,
+                    'created_ts': datetime.to_seconds(raw_posts[3].created_ts),
+                    'updated_ts': datetime.to_seconds(raw_posts[3].updated_ts),
+                    'author': { 'id': raw_users[1].id, 'username': raw_users[1].username },
+                },
+            ])
 
     def test_success_to_create_post(self):
         with self.flask_app.test_client() as client:
