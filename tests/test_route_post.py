@@ -91,6 +91,29 @@ class TestRoutePost(TestBasicApp):
                 },
             ])
 
+    def test_success_to_list_user_post(self):
+        raw_users, raw_posts = self.createUsersAndPosts()
+        with self.flask_app.test_client() as client:
+            res = client.get('/users/{}/posts'.format(raw_users[0].username))
+            res_json = res.get_json()
+
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res_json['code'], 200)
+            self.assertEqual(res_json['data']['posts'], [
+                {
+                    'id': raw_posts[0].id,
+                    'title': raw_posts[0].title,
+                    'created_ts': datetime.to_seconds(raw_posts[0].created_ts),
+                    'updated_ts': datetime.to_seconds(raw_posts[0].updated_ts),
+                },
+                {
+                    'id': raw_posts[1].id,
+                    'title': raw_posts[1].title,
+                    'created_ts': datetime.to_seconds(raw_posts[1].created_ts),
+                    'updated_ts': datetime.to_seconds(raw_posts[1].updated_ts),
+                },
+            ])
+
     def test_success_to_create_post(self):
         with self.flask_app.test_client() as client:
             post_title = 'Some Post Title'
