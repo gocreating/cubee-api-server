@@ -95,7 +95,7 @@ class TestRoutePost(TestBasicApp):
 
     def test_fail_to_read_non_existing_post(self):
         with self.flask_app.test_client() as client:
-            res = client.get('/posts/0')
+            res = client.get('/posts/123')
             res_json = res.get_json()
             self.assertEqual(res.status_code, 404)
             self.assertEqual(res_json['code'], 404)
@@ -162,12 +162,6 @@ class TestRoutePost(TestBasicApp):
             self.assertTrue(res_json['data']['message'])
 
     def test_fail_to_update_non_existing_post(self):
-        post_title = 'ORIGINAL POST TITLE'
-        post_body = {
-            'key1': 'value1',
-            'key2': 'value2',
-        }
-        origin_post = self.createPost(self.user_id, post_title, post_body)
         with self.flask_app.test_client() as client:
             new_post_title = 'NEW POST TITLE'
             new_post_body = {
